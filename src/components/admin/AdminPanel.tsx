@@ -7,6 +7,8 @@ import { Pencil, Plus, Trash2, Upload, LogOut } from "lucide-react";
 import { AdminAchadinhos } from "@/components/admin/AdminAchadinhos";
 import { AdminTestimonials } from "@/components/admin/AdminTestimonials";
 import { AdminSetupStatus } from "@/components/admin/AdminSetupStatus";
+import { AdminSales } from "@/components/admin/AdminSales";
+import { AdminWaitlist } from "@/components/admin/AdminWaitlist";
 import { cn } from "@/lib/utils";
 
 const emptyForm = {
@@ -41,9 +43,9 @@ export function AdminPanel() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<"produtos" | "achadinhos" | "depoimentos">(
-    "produtos"
-  );
+  const [tab, setTab] = useState<
+    "vendas" | "avise-me" | "produtos" | "achadinhos" | "depoimentos"
+  >("vendas");
 
   useEffect(() => {
     const run = async () => {
@@ -230,7 +232,7 @@ export function AdminPanel() {
           <div>
             <h1 className="font-display text-4xl text-elomiah-green">Admin</h1>
             <p className="text-sm text-elomiah-muted">
-              Produtos, achadinhos e depoimentos
+              Vendas, avise-me, produtos, achadinhos e depoimentos
             </p>
           </div>
           <div className="flex gap-3">
@@ -250,6 +252,8 @@ export function AdminPanel() {
         <div className="mb-10 flex gap-6 border-b border-elomiah-green/10">
           {(
             [
+              ["vendas", "Vendas"],
+              ["avise-me", "Avise-me"],
               ["produtos", "Produtos"],
               ["achadinhos", "Achadinhos"],
               ["depoimentos", "Depoimentos"],
@@ -266,6 +270,8 @@ export function AdminPanel() {
           ))}
         </div>
 
+        {tab === "vendas" && <AdminSales />}
+        {tab === "avise-me" && <AdminWaitlist />}
         {tab === "achadinhos" && <AdminAchadinhos />}
         {tab === "depoimentos" && <AdminTestimonials />}
         {tab === "produtos" && (

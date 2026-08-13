@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { isAuthenticated } from "@/lib/auth";
+import { getWaitlist, saveWaitlist } from "@/lib/data";
+import { rateLimit } from "@/lib/rate-limit";
+import { WaitlistEntry } from "@/lib/types";
 
-const waitlistPath = path.join(process.cwd(), "data", "waitlist.json");
+export const dynamic = "force-dynamic";
 
 const schema = z.object({
   productSlug: z.string().min(1).max(120),
@@ -13,35 +14,67 @@ const schema = z.object({
   contact: z.string().min(5).max(120),
 });
 
-async function readWaitlist() {
-  try {
-    const raw = await fs.readFile(waitlistPath, "utf-8");
-    return JSON.parse(raw) as unknown[];
-  } catch {
-    return [];
+export async function GET() {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
+  const list = await getWaitlist();
+  return NextResponse.json(
+    [...list].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+  );
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limited = rateLimit(`waitlist:${ip}`, 8, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Muitas tentativas. Aguarde um minuto." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
     }
 
-    const list = await readWaitlist();
-    const entry = {
-      id: `w_${Date.now()}`,
+    const list = await getWaitlist();
+    const entry: WaitlistEntry = {
+      id: crypto.randomUUID(),
       ...parsed.data,
       createdAt: new Date().toISOString(),
     };
     list.push(entry);
-    await fs.mkdir(path.dirname(waitlistPath), { recursive: true });
-    await fs.writeFile(waitlistPath, JSON.stringify(list, null, 2));
-    revalidatePath("/admin");
-    return NextResponse.json({ ok: true });
+    await saveWaitlist(list);
+
+    return NextResponse.json({ ok: true, id: entry.id }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Falha ao salvar" }, { status: 500 });
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
+  const id = new URL(req.url).searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "id obrigatório" }, { status: 400 });
+  }
+
+  const list = await getWaitlist();
+  const next = list.filter((e) => e.id !== id);
+  if (next.length === list.length) {
+    return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  }
+  await saveWaitlist(next);
+  return NextResponse.json({ ok: true });
 }

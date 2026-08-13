@@ -38,6 +38,37 @@ export const ALLOWED_UPLOAD_TYPES = [
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
+export const saleItemSchema = z.object({
+  productId: z.string().min(1).max(80),
+  productName: z.string().min(1).max(120),
+  quantity: z.number().int().min(1).max(99),
+  unitPrice: z.number().min(0).max(100000),
+});
+
+export const saleCreateSchema = z.object({
+  channel: z
+    .enum(["whatsapp", "shopee", "amazon", "mercadolivre", "manual"])
+    .default("whatsapp"),
+  status: z.enum(["iniciado", "confirmado", "cancelado"]).optional(),
+  customerName: z.string().min(2).max(80),
+  customerPhone: z.string().max(30).optional(),
+  city: z.string().max(120).optional(),
+  cep: z.string().max(12).optional(),
+  items: z.array(saleItemSchema).min(1).max(40),
+  giftWrap: z.number().min(0).max(500).optional(),
+  notes: z.string().max(500).optional(),
+  createdAt: z.string().datetime().optional(),
+});
+
+export const saleUpdateSchema = z.object({
+  status: z.enum(["iniciado", "confirmado", "cancelado"]).optional(),
+  notes: z.string().max(500).optional(),
+  channel: z
+    .enum(["whatsapp", "shopee", "amazon", "mercadolivre", "manual"])
+    .optional(),
+});
+
+
 export const achadinhoSchema = z.object({
   name: z.string().min(1).max(120).optional(),
   price: z.number().min(0).optional(),

@@ -57,7 +57,7 @@ export function ProductDetail({
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (isExternal || outOfStock || !isConfiguredWhatsApp()) return;
     trackBuyNow({
       id: product.id,
@@ -65,6 +65,26 @@ export function ProductDetail({
       price: product.price,
       quantity: qty,
     });
+    try {
+      await fetch("/api/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: "whatsapp",
+          customerName: "Compra rápida (WhatsApp)",
+          items: [
+            {
+              productId: product.id,
+              productName: product.name,
+              quantity: qty,
+              unitPrice: product.price,
+            },
+          ],
+        }),
+      });
+    } catch {
+      // segue para o WhatsApp mesmo se o registro falhar
+    }
     const total = formatPrice(product.price * qty);
     const message = [
       `Olá! Quero comprar agora:`,

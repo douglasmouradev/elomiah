@@ -8,12 +8,12 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#f0ebe3]">
-      {/* Uma só composição: foto de ponta a ponta */}
+    <section className="relative min-h-[100svh] overflow-hidden bg-[#f3efe8]">
+      {/* Full-bleed: frascos à direita, espaço editorial à esquerda */}
       <motion.div
-        initial={{ opacity: 0, scale: 1.06 }}
+        initial={{ opacity: 0, scale: 1.04 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.8, ease }}
+        transition={{ duration: 1.7, ease }}
         className="absolute inset-0"
       >
         <Image
@@ -21,29 +21,54 @@ export function Hero() {
           alt="Coleção Refúgio — Recomeço, Encontro e Equilíbrio"
           fill
           sizes="100vw"
-          quality={93}
+          quality={94}
           priority
-          className="object-cover object-[68%_42%] md:object-[72%_40%]"
+          className="hidden object-cover object-right md:block"
+        />
+        <Image
+          src="/images/produtos/colecao-refugio-hero-mobile.jpg"
+          alt="Coleção Refúgio — frascos Elomiah"
+          fill
+          sizes="100vw"
+          quality={92}
+          priority
+          className="object-cover object-[78%_42%] md:hidden"
         />
       </motion.div>
 
-      {/* Véu creme — funde texto e foto sem corte seco */}
+      {/* Véu: legibilidade do texto sem esconder os frascos */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
             linear-gradient(90deg,
               #f3efe8 0%,
-              rgba(243,239,232,0.94) 28%,
-              rgba(243,239,232,0.55) 48%,
-              rgba(243,239,232,0.12) 68%,
+              #f3efe8 22%,
+              rgba(243,239,232,0.92) 36%,
+              rgba(243,239,232,0.45) 52%,
+              rgba(243,239,232,0.08) 68%,
               transparent 82%
             ),
             linear-gradient(180deg,
+              rgba(243,239,232,0.55) 0%,
+              transparent 22%,
+              transparent 78%,
+              rgba(243,239,232,0.5) 100%
+            )
+          `,
+        }}
+        aria-hidden
+      />
+      {/* Mobile: mais véu embaixo onde fica o texto */}
+      <div
+        className="pointer-events-none absolute inset-0 md:hidden"
+        style={{
+          background: `
+            linear-gradient(180deg,
               rgba(243,239,232,0.35) 0%,
               transparent 28%,
-              transparent 72%,
-              rgba(243,239,232,0.45) 100%
+              rgba(243,239,232,0.55) 58%,
+              #f3efe8 100%
             )
           `,
         }}
@@ -108,7 +133,6 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Respiração inferior — convida ao scroll */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

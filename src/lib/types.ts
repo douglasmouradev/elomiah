@@ -64,6 +64,64 @@ export interface CartItem {
   quantity: number;
 }
 
+export type SaleStatus = "iniciado" | "confirmado" | "cancelado";
+
+export type SaleChannel =
+  | "whatsapp"
+  | "shopee"
+  | "amazon"
+  | "mercadolivre"
+  | "manual";
+
+export interface SaleItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface Sale {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  status: SaleStatus;
+  channel: SaleChannel;
+  customerName: string;
+  customerPhone?: string;
+  city?: string;
+  cep?: string;
+  items: SaleItem[];
+  subtotal: number;
+  giftWrap: number;
+  total: number;
+  notes?: string;
+  /** Evita baixar estoque duas vezes ao reconfirmar */
+  stockApplied?: boolean;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  productSlug: string;
+  productName: string;
+  name: string;
+  contact: string;
+  createdAt: string;
+}
+
+export const SALE_STATUS_LABELS: Record<SaleStatus, string> = {
+  iniciado: "Iniciado",
+  confirmado: "Confirmado",
+  cancelado: "Cancelado",
+};
+
+export const SALE_CHANNEL_LABELS: Record<SaleChannel, string> = {
+  whatsapp: "WhatsApp",
+  shopee: "Shopee",
+  amazon: "Amazon",
+  mercadolivre: "Mercado Livre",
+  manual: "Manual",
+};
+
 export const CATEGORY_LABELS: Record<ProductCategory, string> = {
   "spray-ambiente": "Spray Ambiente",
   perfume: "Perfume",

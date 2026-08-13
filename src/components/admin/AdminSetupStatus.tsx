@@ -6,12 +6,16 @@ type ChecklistItem = { id: string; ok: boolean; label: string };
 
 export function AdminSetupStatus() {
   const [items, setItems] = useState<ChecklistItem[] | null>(null);
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/status")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.checklist) setItems(data.checklist);
+        if (typeof data?.waitlistCount === "number") {
+          setWaitlistCount(data.waitlistCount);
+        }
       })
       .catch(() => undefined);
   }, []);
@@ -26,6 +30,7 @@ export function AdminSetupStatus() {
         <p className="section-label">Setup produção</p>
         <p className="text-xs text-elomiah-muted">
           {done}/{items.length} prontos
+          {waitlistCount != null ? ` · ${waitlistCount} avise-me` : ""}
         </p>
       </div>
       <ul className="mt-4 grid gap-2 sm:grid-cols-2">

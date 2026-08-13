@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, isAdminConfigured } from "@/lib/auth";
+import { getAchadinhos, getTestimonials, getWaitlist } from "@/lib/data";
 import { isSupabaseEnabled } from "@/lib/supabase";
 import {
   hasConfiguredMarketplaces,
@@ -28,7 +29,21 @@ export async function GET() {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  const geo = await hasGeoPhoto();
+  const [geo, achadinhos, testimonials, waitlist] = await Promise.all([
+    hasGeoPhoto(),
+    getAchadinhos(),
+    getTestimonials(),
+    getWaitlist(),
+  ]);
+
+  const achadinhosWithImage = achadinhos.filter((a) => Boolean(a.image?.trim()));
+  const testimonialsWithPhoto = testimonials.filter((t) =>
+    Boolean(t.photo?.trim())
+  );
+  const siteUrlOk =
+    Boolean(siteConfig.url) &&
+    !siteConfig.url.includes("localhost") &&
+    siteConfig.url.startsWith("http");
 
   return NextResponse.json({
     supabase: isSupabaseEnabled(),
@@ -37,6 +52,7 @@ export async function GET() {
     marketplaces: configuredMarketplaces().map((m) => m.key),
     hasMarketplaces: hasConfiguredMarketplaces(),
     siteUrl: siteConfig.url,
+    waitlistCount: waitlist.length,
     checklist: [
       {
         id: "whatsapp",
@@ -44,19 +60,36 @@ export async function GET() {
         label: "WhatsApp configurado",
       },
       {
+        id: "site-url",
+        ok: siteUrlOk,
+        label: "SITE_URL pública (não localhost)",
+      },
+      {
         id: "supabase",
         ok: isSupabaseEnabled(),
-        label: "Supabase (persistência em produção)",
+        label: "Supabase (produtos, vendas, waitlist, uploads)",
       },
       {
         id: "admin",
-        ok: Boolean(process.env.ADMIN_PASSWORD && process.env.ADMIN_SECRET),
+        ok: isAdminConfigured(),
         label: "ADMIN_PASSWORD e ADMIN_SECRET",
       },
       {
         id: "geo",
         ok: geo,
         label: "Foto da Geo em public/images/geo.jpg",
+      },
+      {
+        id: "achadinhos",
+        ok: achadinhos.length > 0 && achadinhosWithImage.length === achadinhos.length,
+        label: `Achadinhos com imagem (${achadinhosWithImage.length}/${achadinhos.length})`,
+      },
+      {
+        id: "depoimentos",
+        ok:
+          testimonials.length > 0 &&
+          testimonialsWithPhoto.length >= Math.min(3, testimonials.length),
+        label: `Depoimentos com foto (${testimonialsWithPhoto.length}/${testimonials.length})`,
       },
       {
         id: "marketplaces",
@@ -67,6 +100,11 @@ export async function GET() {
         id: "ga",
         ok: Boolean(siteConfig.gaId),
         label: "GA4 (NEXT_PUBLIC_GA_ID)",
+      },
+      {
+        id: "waitlist-store",
+        ok: isSupabaseEnabled() || process.env.NODE_ENV !== "production",
+        label: "Waitlist persistente (Supabase em produção)",
       },
     ],
   });

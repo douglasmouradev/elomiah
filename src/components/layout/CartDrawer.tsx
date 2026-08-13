@@ -126,12 +126,24 @@ export function CartDrawer() {
   const panelRef = useRef<HTMLElement>(null);
   const formId = useId();
   const [form, setForm] = useState<CheckoutForm>(emptyCheckout);
+  const [checkoutSent, setCheckoutSent] = useState(false);
   const formRef = useRef(form);
   formRef.current = form;
 
   useEffect(() => {
     setForm(loadCheckout());
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      setCheckoutSent(
+        Boolean(window.sessionStorage.getItem("elomiah-checkout-sent"))
+      );
+    } catch {
+      setCheckoutSent(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -212,15 +224,57 @@ export function CartDrawer() {
   const productsTotal = totalPrice();
   const checkoutTotal = productsTotal + (form.giftWrap ? GIFT_WRAP_PRICE : 0);
 
-  const onCheckout = (e: FormEvent) => {
+  const onCheckout = async (e: FormEvent) => {
     e.preventDefault();
     if (!canCheckout || !isConfiguredWhatsApp()) return;
     trackBeginCheckout(checkoutTotal, items.length);
+
+    const payload = {
+      channel: "whatsapp" as const,
+      customerName: form.name.trim(),
+      customerPhone: form.phone.trim() || undefined,
+      city: form.city.trim() || undefined,
+      cep: form.cep.trim() || undefined,
+      giftWrap: form.giftWrap ? GIFT_WRAP_PRICE : 0,
+      notes: [
+        form.giftWrap && form.giftMessage
+          ? `Presente: ${form.giftMessage}`
+          : null,
+        form.notes.trim() || null,
+      ]
+        .filter(Boolean)
+        .join(" · ") || undefined,
+      items: items.map((item) => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+      })),
+    };
+
+    try {
+      await fetch("/api/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      // Não bloqueia o WhatsApp se o registro falhar
+    }
+
     const href = whatsappLink(
       buildMessage(items, formatPrice(checkoutTotal), form)
     );
     window.open(href, "_blank", "noopener,noreferrer");
-    clear();
+    try {
+      window.sessionStorage.setItem(
+        "elomiah-checkout-sent",
+        new Date().toISOString()
+      );
+    } catch {
+      /* ignore */
+    }
+    setCheckoutSent(true);
     close();
   };
 
@@ -260,6 +314,27 @@ export function CartDrawer() {
                 <X size={20} />
               </button>
             </div>
+
+            {checkoutSent && items.length > 0 && (
+              <div className="border-b border-elomiah-green/[0.08] bg-elomiah-green/[0.03] px-6 py-3 text-sm text-elomiah-muted">
+                Pedido enviado ao WhatsApp.{" "}
+                <button
+                  type="button"
+                  className="text-elomiah-green underline-offset-2 hover:underline"
+                  onClick={() => {
+                    clear();
+                    try {
+                      window.sessionStorage.removeItem("elomiah-checkout-sent");
+                    } catch {
+                      /* ignore */
+                    }
+                    setCheckoutSent(false);
+                  }}
+                >
+                  Esvaziar carrinho
+                </button>
+              </div>
+            )}
 
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               <div className="flex-1 px-6 py-6">

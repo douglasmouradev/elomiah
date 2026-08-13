@@ -53,3 +53,21 @@ export function trackBuyNow(product: {
     quantity: product.quantity,
   });
 }
+
+export function trackPurchase(sale: {
+  id: string;
+  total: number;
+  items: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+  }[];
+}) {
+  trackEvent("purchase", {
+    transaction_id: sale.id,
+    currency: "BRL",
+    value: sale.total,
+    items: sale.items.length,
+  });
+}
