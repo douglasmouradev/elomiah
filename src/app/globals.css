@@ -3,25 +3,139 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --elomiah-green: #152921;
+  --elomiah-gold: #b8956b;
+  --elomiah-cream: #f7f3ec;
+  --elomiah-dark: #0c1a14;
+  --elomiah-muted: #5c5c56;
+  --elomiah-surface: #ede8df;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: auto;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--elomiah-green);
+  background-color: var(--elomiah-cream);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+::selection {
+  background: rgba(184, 149, 107, 0.22);
+  color: var(--elomiah-dark);
+}
+
+@layer components {
+  .section-padding {
+    @apply px-5 py-24 md:px-12 md:py-32 lg:px-20;
+  }
+
+  .container-brand {
+    @apply mx-auto w-full max-w-[76rem];
+  }
+
+  .container-wide {
+    @apply mx-auto w-full max-w-[88rem];
+  }
+
+  .heading-display {
+    @apply font-display font-medium leading-[1.08] tracking-tight text-elomiah-green;
+  }
+
+  .text-muted {
+    @apply text-elomiah-muted;
+  }
+
+  .gold-rule {
+    @apply h-px w-12 bg-elomiah-gold/70;
+  }
+
+  .section-label {
+    @apply font-body text-xs font-medium tracking-wide text-elomiah-gold;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2.5 bg-elomiah-green px-8 py-3.5 font-body text-[13px] font-medium tracking-soft text-elomiah-cream transition-all duration-500 hover:bg-elomiah-dark;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2.5 border border-elomiah-green/20 bg-transparent px-8 py-3.5 font-body text-[13px] font-medium tracking-soft text-elomiah-green transition-all duration-500 hover:border-elomiah-green hover:bg-elomiah-green/[0.03];
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2.5 bg-elomiah-gold px-8 py-3.5 font-body text-[13px] font-medium tracking-soft text-elomiah-dark transition-all duration-500 hover:bg-[#a88458];
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-link {
+    @apply inline-flex items-center gap-2 font-body text-[13px] font-medium tracking-soft text-elomiah-green underline-offset-[6px] transition-colors duration-300 hover:text-elomiah-gold hover:underline;
+  }
+
+  .chip {
+    @apply border-b-2 border-transparent px-1 pb-2 font-body text-sm text-elomiah-muted transition-colors duration-300 hover:text-elomiah-green;
+  }
+
+  .chip-active {
+    @apply border-elomiah-green text-elomiah-green;
+  }
+
+  .surface-panel {
+    @apply bg-elomiah-surface/60;
+  }
+
+  .linen-bg {
+    background-color: var(--elomiah-cream);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+  }
+
+  .input-brand {
+    @apply w-full border-0 border-b border-elomiah-green/15 bg-transparent py-3 text-sm text-elomiah-green outline-none transition-colors placeholder:text-elomiah-muted/50 focus:border-elomiah-gold;
+  }
+
+  .input-admin {
+    @apply mt-1.5 w-full border border-elomiah-green/15 bg-transparent px-2.5 py-2 text-sm outline-none focus:border-elomiah-gold;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+html.spray-nav-active main,
+html.spray-nav-active header,
+html.spray-nav-active footer {
+  transition:
+    opacity 680ms cubic-bezier(0.45, 0, 0.55, 1),
+    filter 680ms cubic-bezier(0.45, 0, 0.55, 1),
+    transform 680ms cubic-bezier(0.45, 0, 0.55, 1);
+  opacity: 0.5;
+  filter: blur(2px);
+  transform: scale(0.995);
+}
+
+html.spray-nav-fallback main {
+  transition: opacity 450ms cubic-bezier(0.45, 0, 0.55, 1);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

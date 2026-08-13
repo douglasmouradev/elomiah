@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+        env:
+          ADMIN_PASSWORD: ci-test-password
+          ADMIN_SECRET: ci-test-secret
+          NEXT_PUBLIC_WHATSAPP: "5511999999999"
+          NEXT_PUBLIC_SITE_URL: "https://elomiah.com.br"

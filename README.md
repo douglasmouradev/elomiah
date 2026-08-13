@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Elomiah
 
-## Getting Started
+Site institucional e e-commerce da marca **Elomiah** — refúgio de aromatizantes e perfumes de alto padrão.
 
-First, run the development server:
+**Slogan:** *Onde o sagrado encontra a essência.*
+
+## Stack
+
+- Next.js 14 (App Router) + TypeScript + Tailwind CSS
+- Framer Motion + GSAP ScrollTrigger
+- Zustand (carrinho persistido)
+- Zod (validação de APIs)
+- Painel admin (`/admin`) com JSON local ou **Supabase**
+
+## Como rodar
 
 ```bash
+cp .env.example .env.local
+# Edite .env.local com WhatsApp, senhas admin, etc.
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Veja `.env.example`. **Obrigatório em produção:**
 
-## Learn More
+- `ADMIN_PASSWORD` e `ADMIN_SECRET`
+- `NEXT_PUBLIC_WHATSAPP`
+- `NEXT_PUBLIC_SITE_URL`
 
-To learn more about Next.js, take a look at the following resources:
+Opcionais: Instagram, e-mails, URLs de marketplaces, `NEXT_PUBLIC_GA_ID`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Checklist de produção (ordem)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Foto da Geo** — salve `public/images/geo.jpg` (a página Sobre troca automaticamente)
+2. **Fotos dos Achadinhos** — upload no admin ou `public/images/achadinhos/`
+3. **Supabase** (persistência na Vercel):
+   - Crie projeto em [supabase.com](https://supabase.com)
+   - Rode `supabase/schema.sql` no SQL Editor
+   - Storage → bucket público `uploads`
+   - Preencha `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
+4. **Marketplaces** — `NEXT_PUBLIC_SHOPEE_URL`, `AMAZON`, `MERCADOLIVRE`
+5. **Depoimentos reais** — aba Depoimentos no admin
+6. **Estoque** — ajuste no admin (valores iniciais já são realistas)
+7. **Kit Refúgio** — já no catálogo (`/produtos/kit-refugio`)
+8. **GA4** — `NEXT_PUBLIC_GA_ID` (eventos: add_to_cart, begin_checkout, buy_now_whatsapp)
+9. Frete estimado por CEP — já no carrinho
 
-## Deploy on Vercel
+O admin mostra o status desse checklist após o login.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Admin
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- URL: `/admin` (não linkada no footer)
+- CRUD de produtos, achadinhos e depoimentos + upload
+- Após salvar, o site revalida (ISR 60s)
+
+## Deploy (Vercel)
+
+1. Conecte o repositório
+2. Configure as variáveis de `.env.example`
+3. Sem Supabase, o admin grava JSON local (efêmero em serverless)
+
+## Scripts
+
+- `npm run optimize-images` — gera thumbs dos produtos
+
+## Páginas
+
+`/`, `/loja`, `/produtos/[slug]`, `/curso`, `/achadinhos`, `/sobre`, `/depoimentos`, `/contato`, `/faq`, `/privacidade`, `/termos`, `/trocas-devolucoes`, `/admin`
