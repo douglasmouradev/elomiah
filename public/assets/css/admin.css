@@ -1,0 +1,248 @@
+:root {
+  --verde: #1B4332;
+  --verde-escuro: #0F2C22;
+  --dourado: #C9A24B;
+  --creme: #FDFBF6;
+  --cinza: #4A4A45;
+  --linha: rgba(201, 162, 75, 0.35);
+}
+
+html:has(.admin-body),
+html:has(.admin-body) body {
+  overflow: auto;
+  height: auto;
+}
+
+.admin-body {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--creme);
+  color: var(--verde);
+  font-family: Inter, sans-serif;
+  overflow: visible;
+}
+
+.admin-side {
+  background: var(--verde-escuro);
+  color: #efe9dc;
+  padding: 2rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.admin-side a { color: #efe9dc; text-decoration: none; }
+.admin-brand {
+  font-family: "Playfair Display", serif;
+  letter-spacing: 0.4em;
+  font-size: 0.85rem;
+  color: var(--dourado);
+}
+.admin-nav { display: flex; flex-direction: column; gap: 0.55rem; }
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid transparent;
+}
+.admin-nav a:hover,
+.admin-nav a.is-on { color: var(--dourado); border-bottom-color: var(--dourado); }
+.nav-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  margin-left: 0.4rem;
+  padding: 0 0.3rem;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+  background: var(--dourado);
+  color: var(--verde-escuro);
+}
+
+.admin-main { padding: 2rem 2.2rem 4rem; }
+.admin-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--linha);
+  padding-bottom: 1rem;
+}
+.admin-top-end {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+.admin-notify { position: relative; }
+.admin-notify-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--linha);
+  color: var(--verde);
+}
+.admin-notify-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.22rem;
+  font-size: 0.62rem;
+  line-height: 1rem;
+  text-align: center;
+  background: var(--dourado);
+  color: var(--verde-escuro);
+  display: none;
+}
+.admin-notify-count.is-on { display: block; }
+.admin-notify-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  width: min(360px, 78vw);
+  background: var(--creme);
+  border: 1px solid var(--linha);
+  z-index: 30;
+  padding: 0.7rem 0;
+}
+.admin-notify-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--linha);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.admin-notify-clear {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cinza);
+}
+.admin-notify-empty {
+  padding: 1rem;
+  color: var(--cinza);
+  font-size: 0.9rem;
+  margin: 0;
+}
+.admin-notify-item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--linha);
+}
+.admin-notify-item strong {
+  font-family: "Playfair Display", serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.admin-notify-item span { color: var(--cinza); font-size: 0.82rem; }
+.admin-notify-item.is-new { background: rgba(201, 162, 75, 0.1); }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.metric {
+  border: 1px solid var(--linha);
+  padding: 1.2rem;
+}
+.metric b {
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+.metric span {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cinza);
+}
+.table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.table th {
+  text-align: left;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--linha);
+  padding: 0.5rem;
+}
+.table td { padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--linha); vertical-align: middle; }
+.thumb-sm { width: 48px; height: 64px; object-fit: contain; background: #eee; }
+.admin-guest {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--creme);
+}
+.admin-card {
+  width: min(420px, 92vw);
+  border: 1px solid var(--linha);
+  padding: 2.4rem 2rem;
+  text-align: center;
+}
+.previews { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.previews img { width: 72px; height: 90px; object-fit: cover; }
+.grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-form .full { grid-column: 1 / -1; }
+.period-tabs { display: flex; gap: 0.4rem; }
+.chart-wrap { border: 1px solid var(--linha); padding: 1.2rem; margin-bottom: 2rem; }
+
+.status-pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid var(--linha);
+  white-space: nowrap;
+}
+.status-pendente { color: var(--cinza); }
+.status-pago { color: var(--verde); border-color: var(--verde); }
+.status-enviado { color: #6a5420; border-color: var(--dourado); }
+.status-entregue { color: var(--creme); background: var(--verde); border-color: var(--verde); }
+.status-cancelado { color: #8a3b32; border-color: #8a3b32; }
+
+.pedido-kicker { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.pedido-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.6rem;
+}
+.pedido-pipeline li {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.55rem 0.4rem;
+  text-align: center;
+  border-bottom: 1px solid var(--linha);
+  color: var(--cinza);
+  opacity: 0.45;
+}
+.pedido-pipeline li.is-done,
+.pedido-pipeline li.is-on { opacity: 1; color: var(--verde); border-bottom-color: var(--dourado); }
+.pedido-pipeline li.is-on { font-weight: 500; }
+.pedido-ops { margin-top: 2rem; max-width: 420px; display: grid; gap: 1.6rem; }
+.pedido-acoes { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+.btn-compact { min-height: 36px; padding: 0.35rem 0.8rem; font-size: 0.65rem; }
+
+@media (max-width: 900px) {
+  .admin-body { grid-template-columns: 1fr; }
+  .metrics, .grid-form, .pedido-pipeline { grid-template-columns: 1fr 1fr; }
+}

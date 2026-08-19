@@ -1,0 +1,81 @@
+<?php
+\App\Core\View::partial('partials/flash');
+$usuario = $usuario ?? [];
+$pedidos = $pedidos ?? [];
+?>
+<section class="page-hero container">
+    <p class="eyebrow">Conta</p>
+    <h1>Seus pedidos</h1>
+    <p class="lede lede-center">Aqui ficam as peças, o andamento e o rastreio quando o ateliê despacha.</p>
+</section>
+<section class="container account-page">
+    <p class="account-hello">Olá, <?= e((string) ($usuario['nome'] ?? '')) ?>.</p>
+
+    <?php $endereco = $endereco ?? null; $freteInfo = frete(); ?>
+    <article class="account-address">
+        <p class="eyebrow">Endereço de envio</p>
+        <p class="field-hint"><?= e($freteInfo['nome']) ?> · <?= e($freteInfo['prazo']) ?></p>
+        <form class="form" method="post" action="<?= e(url('/conta/endereco')) ?>">
+            <?= csrf_field() ?>
+            <label><span>CEP</span>
+                <input type="text" name="cep" id="cep" maxlength="9" value="<?= e(cep_format($endereco['cep'] ?? '')) ?>" required autocomplete="postal-code">
+            </label>
+            <p id="cep-hint" class="field-hint">Ao informar o CEP, rua, bairro, cidade e estado se preenchem sozinhos.</p>
+            <label><span>Rua</span><input type="text" name="logradouro" id="logradouro" value="<?= e((string) ($endereco['logradouro'] ?? '')) ?>" required></label>
+            <div class="split-2">
+                <label><span>Número</span><input type="text" name="numero" id="numero" value="<?= e((string) ($endereco['numero'] ?? '')) ?>" required></label>
+                <label><span>Complemento</span><input type="text" name="complemento" value="<?= e((string) ($endereco['complemento'] ?? '')) ?>"></label>
+            </div>
+            <label><span>Bairro</span><input type="text" name="bairro" id="bairro" value="<?= e((string) ($endereco['bairro'] ?? '')) ?>" required></label>
+            <div class="split-2">
+                <label><span>Cidade</span><input type="text" name="cidade" id="cidade" value="<?= e((string) ($endereco['cidade'] ?? '')) ?>" required></label>
+                <label><span>Estado</span><input type="text" name="estado" id="estado" maxlength="2" value="<?= e((string) ($endereco['estado'] ?? '')) ?>" required></label>
+            </div>
+            <button class="btn btn-ghost" type="submit">Guardar endereço</button>
+        </form>
+    </article>
+
+    <?php if (!$pedidos): ?>
+        <div class="cart-empty">
+            <p class="lede lede-center">Ainda não há pedidos nesta conta.</p>
+            <p><a class="btn btn-gold" href="<?= e(url('/loja')) ?>">Ir à coleção</a></p>
+        </div>
+    <?php else: ?>
+        <div class="account-orders">
+            <?php foreach ($pedidos as $pedido): ?>
+                <?php $rastreioLink = rastreio_url($pedido['codigo_rastreio'] ?? null, $pedido['transportadora'] ?? null); ?>
+                <article class="account-order">
+                    <header>
+                        <p class="eyebrow"><?= e($pedido['codigo']) ?></p>
+                        <span class="status-pill status-<?= e($pedido['status']) ?>"><?= e(pedido_status_rotulo($pedido['status'])) ?></span>
+                    </header>
+                    <ul class="account-items">
+                        <?php foreach ($pedido['itens'] ?? [] as $item): ?>
+                            <li>
+                                <img src="<?= e(asset($item['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="">
+                                <span>
+                                    <strong><?= e($item['nome_produto']) ?></strong>
+                                    <small><?= (int) $item['quantidade'] ?> × <?= e(money($item['preco_unitario'])) ?></small>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <p class="account-total">Total <?= e(money($pedido['total'])) ?></p>
+                    <?php if (!empty($pedido['codigo_rastreio'])): ?>
+                        <p class="account-track">
+                            <?= e($pedido['transportadora'] ?: 'Correios') ?> · <?= e($pedido['codigo_rastreio']) ?>
+                            <?php if ($rastreioLink): ?>
+                                <a href="<?= e($rastreioLink) ?>" target="_blank" rel="noopener">Rastrear envio</a>
+                            <?php endif; ?>
+                        </p>
+                    <?php elseif (($pedido['status'] ?? '') === 'pago'): ?>
+                        <p class="account-track">Pago. Aguardando o despacho do ateliê.</p>
+                    <?php elseif (($pedido['status'] ?? '') === 'pendente'): ?>
+                        <p class="account-track">Aguardando o pagamento.</p>
+                    <?php endif; ?>
+                    <p><a class="btn btn-ghost" href="<?= e(url('/conta/pedidos/' . $pedido['codigo'])) ?>">Ver pedido</a></p>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>

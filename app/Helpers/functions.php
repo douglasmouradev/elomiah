@@ -1,0 +1,222 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Funções auxiliares globais da Elomiah.
+ */
+
+use App\Core\Csrf;
+use App\Core\Session;
+
+function env(string $key, mixed $default = null): mixed
+{
+    if (array_key_exists($key, $_ENV)) {
+        return $_ENV[$key];
+    }
+    $value = getenv($key);
+    return $value === false ? $default : $value;
+}
+
+function config(string $file): array
+{
+    static $cache = [];
+    if (!isset($cache[$file])) {
+        $path = CONFIG_PATH . DIRECTORY_SEPARATOR . $file . '.php';
+        $cache[$file] = is_file($path) ? require $path : [];
+    }
+    return $cache[$file];
+}
+
+function e(?string $value): string
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function url(string $path = '/'): string
+{
+    $base = rtrim((string) (config('app')['url'] ?? ''), '/');
+    $path = '/' . ltrim($path, '/');
+    return $base . ($path === '/' ? '/' : rtrim($path, '/'));
+}
+
+function asset(string $path): string
+{
+    return url('/assets/' . ltrim($path, '/'));
+}
+
+function current_path(): string
+{
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    return rtrim($uri, '/') ?: '/';
+}
+
+function is_active(string $path): bool
+{
+    $current = current_path();
+    $path = rtrim($path, '/') ?: '/';
+    if ($path === '/') {
+        return $current === '/';
+    }
+    return $current === $path || str_starts_with($current, $path . '/');
+}
+
+function csrf_token(): string
+{
+    return Csrf::token();
+}
+
+function csrf_field(): string
+{
+    return '<input type="hidden" name="_csrf" value="' . e(Csrf::token()) . '">';
+}
+
+function method_field(string $method): string
+{
+    return '<input type="hidden" name="_method" value="' . e(strtoupper($method)) . '">';
+}
+
+function old(string $key, mixed $default = ''): mixed
+{
+    $old = Session::get('_old', []);
+    return $old[$key] ?? $default;
+}
+
+function flash(string $key, mixed $default = null): mixed
+{
+    return Session::flash($key, $default);
+}
+
+function money(float|int|string|null $value): string
+{
+    return 'R$ ' . number_format((float) $value, 2, ',', '.');
+}
+
+function cep_format(?string $cep): string
+{
+    $digitos = preg_replace('/\D+/', '', (string) $cep) ?? '';
+    if (strlen($digitos) === 8) {
+        return substr($digitos, 0, 5) . '-' . substr($digitos, 5);
+    }
+
+    return trim((string) $cep);
+}
+
+/** @return array{valor: float, nome: string, prazo: string} */
+function frete(): array
+{
+    return \App\Models\Configuracao::frete();
+}
+
+function slugify(string $text): string
+{
+    $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text) ?: $text;
+    $text = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $text));
+    return trim($text, '-');
+}
+
+function redirect(string $path, int $code = 302): never
+{
+    http_response_code($code);
+    header('Location: ' . (str_starts_with($path, 'http') ? $path : url($path)));
+    exit;
+}
+
+function client_ip(): string
+{
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    return filter_var($ip, FILTER_VALIDATE_IP) ?: '0.0.0.0';
+}
+
+function now(): string
+{
+    return date('Y-m-d H:i:s');
+}
+
+function str_limit(?string $value, int $limit = 120): string
+{
+    $value = trim((string) $value);
+    if (mb_strlen($value) <= $limit) {
+        return $value;
+    }
+    return rtrim(mb_substr($value, 0, $limit)) . '…';
+}
+
+function is_post(): bool
+{
+    return strtoupper($_SERVER['REQUEST_METHOD'] ?? '') === 'POST';
+}
+
+function whatsapp_url(string $message = ''): string
+{
+    $number = config('app')['whatsapp'] ?? '5571984916767';
+    $q = $message !== '' ? '?text=' . rawurlencode($message) : '';
+    return 'https://wa.me/' . $number . $q;
+}
+
+function achadinhos_url(): string
+{
+    return (string) (config('app')['achadinhos_url'] ?? 'https://collshp.com/geovanaferreira030789?view=storefront');
+}
+
+function shopee_url(): string
+{
+    return (string) (config('app')['shopee_url'] ?? 'https://collshp.com/geovanaferreira030789?view=storefront');
+}
+
+function pagamento_rotulo(?string $metodo): string
+{
+    return match ($metodo) {
+        'cartao' => 'Cartão de crédito',
+        'pix' => 'Pix',
+        default => (string) $metodo,
+    };
+}
+
+function pedido_status_rotulo(?string $status): string
+{
+    return match ($status) {
+        'pendente' => 'Aguardando pagamento',
+        'pago' => 'Pago',
+        'enviado' => 'Enviado',
+        'entregue' => 'Entregue',
+        'cancelado' => 'Cancelado',
+        default => (string) $status,
+    };
+}
+
+function pedido_status_acao(?string $status): ?array
+{
+    return match ($status) {
+        'pendente' => ['status' => 'pago', 'rotulo' => 'Marcar como pago'],
+        'pago' => ['status' => 'enviado', 'rotulo' => 'Marcar como enviado'],
+        'enviado' => ['status' => 'entregue', 'rotulo' => 'Marcar como entregue'],
+        default => null,
+    };
+}
+
+function rastreio_url(?string $codigo, ?string $transportadora = null): ?string
+{
+    $codigo = trim((string) $codigo);
+    if ($codigo === '') {
+        return null;
+    }
+    $via = mb_strtolower((string) $transportadora);
+    if ($via === '' || str_contains($via, 'correio')) {
+        return 'https://www.linkcorreios.com.br/?id=' . rawurlencode($codigo);
+    }
+
+    return null;
+}
+
+function pedido_whatsapp_cliente(?string $telefone, string $mensagem): string
+{
+    $tel = preg_replace('/\D+/', '', (string) $telefone) ?? '';
+    if (strlen($tel) < 10) {
+        return whatsapp_url($mensagem);
+    }
+    if (!str_starts_with($tel, '55')) {
+        $tel = '55' . $tel;
+    }
+    return 'https://wa.me/' . $tel . '?text=' . rawurlencode($mensagem);
+}
