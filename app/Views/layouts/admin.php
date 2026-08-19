@@ -30,6 +30,7 @@ $avisos = \App\Models\Notificacao::recentes(8);
         <a class="<?= is_active('/admin/depoimentos') ? 'is-on' : '' ?>" href="<?= e(url('/admin/depoimentos')) ?>">Depoimentos</a>
         <a class="<?= is_active('/admin/curso') ? 'is-on' : '' ?>" href="<?= e(url('/admin/curso')) ?>">Curso</a>
         <a class="<?= is_active('/admin/pagamento') ? 'is-on' : '' ?>" href="<?= e(url('/admin/pagamento')) ?>">Pagamento</a>
+        <a class="<?= is_active('/admin/conta') ? 'is-on' : '' ?>" href="<?= e(url('/admin/conta')) ?>">Senha</a>
         <a class="<?= is_active('/admin/logs') ? 'is-on' : '' ?>" href="<?= e(url('/admin/logs')) ?>">Auditoria</a>
         <a href="<?= e(url('/')) ?>">Ver o site</a>
         <a href="<?= e(url('/admin/sair')) ?>">Sair</a>

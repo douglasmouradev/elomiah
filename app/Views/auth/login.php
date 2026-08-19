@@ -11,5 +11,6 @@
         <label><span>Senha</span><input type="password" name="senha" required></label>
         <button class="btn btn-gold" type="submit">Entrar</button>
     </form>
-    <p style="margin-top:1.2rem">Ainda sem cadastro? <a href="<?= e(url('/cadastro')) ?>">Criar conta</a></p>
+        <p style="margin-top:1.2rem">Ainda sem cadastro? <a href="<?= e(url('/cadastro')) ?>">Criar conta</a></p>
+        <p><a href="<?= e(url('/recuperar-senha')) ?>">Esqueci a senha</a></p>
 </section>

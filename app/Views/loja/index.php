@@ -7,7 +7,7 @@ $produtos = $produtos ?? [];
 <section class="page-hero container">
     <p class="eyebrow">A coleção</p>
     <h1>A loja</h1>
-    <p class="lede" style="margin-inline:auto">Sprays, essências, difusores e kits. Filtre pelo que o cômodo pede.</p>
+    <p class="lede" style="margin-inline:auto">Cinco névoas em vidro, 120 ml. Filtre pelo que o cômodo pede.</p>
 </section>
 <section class="container" style="padding-top:1rem">
     <form class="filters" method="get" action="<?= e(url('/loja')) ?>">

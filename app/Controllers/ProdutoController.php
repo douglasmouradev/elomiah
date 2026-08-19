@@ -19,8 +19,12 @@ final class ProdutoController extends Controller
         if (!$produto || $produto['status'] !== 'ativo') {
             Response::abort(404, 'Este aroma não está disponível.');
         }
+        if (produto_digital($produto)) {
+            redirect('/curso');
+        }
 
         $imagens = Produto::imagens((int) $produto['id']);
+        $capa = $imagens[0]['caminho'] ?? Produto::capa($produto);
         $relacionados = array_filter(
             Produto::ativos(['categoria' => $produto['categoria_slug'] ?? '']),
             static fn ($p) => (int) $p['id'] !== (int) $produto['id']
@@ -28,6 +32,10 @@ final class ProdutoController extends Controller
 
         $this->view('produto/show', [
             'title' => $produto['nome'] . ' — Elomiah',
+            'metaDescription' => (string) ($produto['descricao_curta'] ?? $produto['citacao'] ?? ''),
+            'ogTitle' => $produto['nome'] . ' — Elomiah',
+            'ogDescription' => (string) ($produto['descricao_curta'] ?: 'Névoa Elomiah em vidro, 120 ml.'),
+            'ogImage' => asset($capa),
             'produto' => $produto,
             'imagens' => $imagens,
             'relacionados' => array_slice($relacionados, 0, 3),

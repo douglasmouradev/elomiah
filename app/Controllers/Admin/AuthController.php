@@ -50,6 +50,37 @@ final class AuthController extends Controller
         redirect('/admin');
     }
 
+    public function senhaForm(Request $request, array $params = []): never
+    {
+        $this->view('admin/senha', [
+            'title' => 'Senha do ateliê',
+        ], 'layouts/admin');
+    }
+
+    public function senha(Request $request, array $params = []): never
+    {
+        $atual = (string) $request->input('senha_atual');
+        $nova = (string) $request->input('senha');
+        $conf = (string) $request->input('senha_confirmation');
+        $user = Auth::user();
+
+        if (!$user || !password_verify($atual, (string) ($user['senha_hash'] ?? ''))) {
+            Session::setFlash('error', 'A senha atual não confere.');
+            redirect('/admin/conta');
+        }
+        if (mb_strlen($nova) < 8 || $nova !== $conf) {
+            Session::setFlash('error', 'A senha nova precisa ter ao menos 8 caracteres e coincidir com a confirmação.');
+            redirect('/admin/conta');
+        }
+
+        \App\Models\Usuario::updateById((int) Auth::id(), [
+            'senha_hash' => password_hash($nova, PASSWORD_DEFAULT),
+        ]);
+        Auth::log('Trocou a senha do ateliê', 'usuarios', (int) Auth::id());
+        Session::setFlash('success', 'Senha do ateliê atualizada.');
+        redirect('/admin/conta');
+    }
+
     public function logout(Request $request, array $params = []): never
     {
         Auth::log('Saída do painel', 'sessao');

@@ -61,9 +61,15 @@ return static function (Router $router): void {
     $router->post('/entrar', [AuthController::class, 'login']);
     $router->get('/cadastro', [AuthController::class, 'registerForm']);
     $router->post('/cadastro', [AuthController::class, 'register']);
+    $router->get('/recuperar-senha', [AuthController::class, 'recuperarForm']);
+    $router->post('/recuperar-senha', [AuthController::class, 'recuperar']);
+    $router->get('/recuperar-senha/{token}', [AuthController::class, 'redefinirForm']);
+    $router->post('/recuperar-senha/{token}', [AuthController::class, 'redefinir']);
     $router->get('/sair', [AuthController::class, 'logout']);
     $router->get('/conta', [ContaController::class, 'index'], $conta);
     $router->post('/conta/endereco', [ContaController::class, 'endereco'], $conta);
+    $router->post('/conta/perfil', [ContaController::class, 'perfil'], $conta);
+    $router->post('/conta/senha', [ContaController::class, 'senha'], $conta);
     $router->get('/conta/pedidos/{codigo}', [ContaController::class, 'pedido'], $conta);
 
     $router->get('/privacidade', [LgpdController::class, 'privacidade']);
@@ -76,6 +82,8 @@ return static function (Router $router): void {
     $router->get('/admin/login', [AdminAuthController::class, 'form']);
     $router->post('/admin/login', [AdminAuthController::class, 'login']);
     $router->get('/admin/sair', [AdminAuthController::class, 'logout'], $admin);
+    $router->get('/admin/conta', [AdminAuthController::class, 'senhaForm'], $admin);
+    $router->post('/admin/conta', [AdminAuthController::class, 'senha'], $admin);
 
     $router->get('/admin', [DashboardController::class, 'index'], $admin);
 

@@ -108,6 +108,48 @@ function frete(): array
     return \App\Models\Configuracao::frete();
 }
 
+function produto_digital(?array $produto): bool
+{
+    if (!$produto) {
+        return false;
+    }
+    $slug = (string) ($produto['slug'] ?? '');
+    $cat = (string) ($produto['categoria_slug'] ?? '');
+    $sku = (string) ($produto['sku'] ?? '');
+
+    return $slug === 'o-ritual-das-essencias' || $cat === 'formacao' || $sku === 'ELO-CURSO';
+}
+
+function carrinho_requer_envio(array $carrinho): bool
+{
+    $items = $carrinho['items'] ?? [];
+    if ($items === []) {
+        return true;
+    }
+    foreach ($items as $item) {
+        if (!produto_digital($item['produto'] ?? null)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/** @return array{valor: float, nome: string, prazo: string} */
+function frete_do_carrinho(array $carrinho): array
+{
+    $frete = frete();
+    if (carrinho_requer_envio($carrinho)) {
+        return $frete;
+    }
+
+    return [
+        'valor' => 0.0,
+        'nome' => 'Acesso digital',
+        'prazo' => 'Sem despacho · o acesso chega por e-mail após o pagamento',
+    ];
+}
+
 function slugify(string $text): string
 {
     $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text) ?: $text;

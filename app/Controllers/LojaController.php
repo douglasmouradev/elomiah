@@ -19,9 +19,14 @@ final class LojaController extends Controller
             $ordenar = 'lancamento';
         }
 
+        $categorias = array_values(array_filter(
+            Categoria::all('ordem ASC'),
+            static fn (array $c): bool => ($c['slug'] ?? '') !== 'formacao'
+        ));
+
         $this->view('loja/index', [
             'title' => 'A loja — Elomiah',
-            'categorias' => Categoria::all('ordem ASC'),
+            'categorias' => $categorias,
             'produtos' => Produto::ativos([
                 'categoria' => $categoria,
                 'ordenar' => $ordenar,

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
     <title><?= e($title ?? 'Elomiah') ?></title>
-    <meta name="description" content="Elomiah — refúgio de aromatizantes e perfumes de alto padrão. Onde o sagrado encontra a essência.">
-    <meta property="og:title" content="<?= e($title ?? 'Elomiah') ?>">
-    <meta property="og:description" content="Elomiah — onde o sagrado encontra a essência. Cinco névoas em vidro, 120 ml.">
-    <meta property="og:image" content="<?= e(asset('images/colecao-refugio.webp')) ?>">
+    <meta name="description" content="<?= e($metaDescription ?? 'Elomiah — refúgio de aromatizantes e perfumes de alto padrão. Onde o sagrado encontra a essência.') ?>">
+    <meta property="og:title" content="<?= e($ogTitle ?? $title ?? 'Elomiah') ?>">
+    <meta property="og:description" content="<?= e($ogDescription ?? 'Elomiah — onde o sagrado encontra a essência. Cinco névoas em vidro, 120 ml.') ?>">
+    <meta property="og:image" content="<?= e($ogImage ?? asset('images/colecao-refugio.webp')) ?>">
     <meta property="og:type" content="website">
     <link rel="icon" href="<?= e(asset('images/logo.png')) ?>?v=2" type="image/png">
     <link rel="apple-touch-icon" href="<?= e(asset('images/logo.png')) ?>?v=2">
@@ -42,9 +42,7 @@
         <nav class="nav-main" aria-label="Principal">
             <a class="<?= is_active('/loja') ? 'is-active' : '' ?>" href="<?= e(url('/loja')) ?>">Loja</a>
             <a class="<?= is_active('/curso') ? 'is-active' : '' ?>" href="<?= e(url('/curso')) ?>">Curso</a>
-            <a class="<?= is_active('/achadinhos') ? 'is-active' : '' ?>" href="<?= e(url('/achadinhos')) ?>">Achadinhos</a>
             <a class="<?= is_active('/sobre') ? 'is-active' : '' ?>" href="<?= e(url('/sobre')) ?>">Sobre</a>
-            <a class="<?= is_active('/depoimentos') ? 'is-active' : '' ?>" href="<?= e(url('/depoimentos')) ?>">Depoimentos</a>
             <a class="<?= is_active('/contato') ? 'is-active' : '' ?>" href="<?= e(url('/contato')) ?>">Contato</a>
         </nav>
         <div class="nav-actions">
@@ -80,6 +78,7 @@
                 <li><a href="<?= e(url('/loja')) ?>">A loja</a></li>
                 <li><a href="<?= e(url('/curso')) ?>">O Ritual das Essências</a></li>
                 <li><a href="<?= e(url('/achadinhos')) ?>">Achadinhos da Geo</a></li>
+                <li><a href="<?= e(url('/depoimentos')) ?>">Depoimentos</a></li>
                 <li><a href="<?= e(url('/sobre')) ?>">A marca e a Geo</a></li>
             </ul>
         </div>

@@ -564,6 +564,18 @@ section { padding: 6.5rem 0; }
   color: var(--cinza);
   font-size: 0.9rem;
 }
+.card-add {
+  margin: 0;
+}
+.card-add button {
+  width: 100%;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dourado);
+  border-bottom: 1px solid var(--linha);
+  padding: 0.35rem 0;
+}
 .price { color: var(--dourado); font-family: var(--serif); letter-spacing: 0.08em; }
 .price-lg { font-size: 1.8rem; margin: 1rem 0; }
 .price-was {

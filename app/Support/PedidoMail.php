@@ -47,7 +47,11 @@ final class PedidoMail
 
         $html = self::layout(
             'Pagamento confirmado',
-            self::intro('O pagamento do pedido ' . self::codigo($pedido) . ' entrou. O ritual segue para o despacho.')
+            self::intro(
+                self::soDigital($pedido)
+                    ? 'O pagamento do pedido ' . self::codigo($pedido) . ' entrou. O acesso à formação chega por e-mail.'
+                    : 'O pagamento do pedido ' . self::codigo($pedido) . ' entrou. O ritual segue para o despacho.'
+            )
             . self::itens($pedido)
             . self::totais($pedido)
             . self::cta('Ver o pedido', url('/conta/pedidos/' . $pedido['codigo']))
@@ -134,14 +138,18 @@ final class PedidoMail
     /** @param array<string, mixed> $pedido */
     private static function totais(array $pedido): string
     {
-        $frete = frete();
-        return '<p style="margin:0 0 6px;font-size:14px;color:#5C6B61">Envio · ' . e($frete['nome']) . ' · ' . e(money($pedido['frete'] ?? $frete['valor'])) . '</p>'
+        $rotulo = self::soDigital($pedido) ? 'Acesso digital' : ('Envio · ' . frete()['nome']);
+        return '<p style="margin:0 0 6px;font-size:14px;color:#5C6B61">' . e($rotulo) . ' · ' . e(money($pedido['frete'] ?? 0)) . '</p>'
             . '<p style="margin:0 0 22px;font-size:20px;font-family:Georgia,serif;color:#1B4332">Total ' . e(money($pedido['total'] ?? 0)) . '</p>';
     }
 
     /** @param array<string, mixed> $pedido */
     private static function envio(array $pedido): string
     {
+        if (self::soDigital($pedido)) {
+            return '<p style="margin:0 0 22px;font-size:13px;color:#5C6B61">Formação digital · o acesso chega por e-mail após o pagamento.</p>';
+        }
+
         $frete = frete();
         $end = $pedido['endereco'] ?? null;
         $html = '<p style="margin:0 0 6px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#C9A24B">Destino</p>';
@@ -156,6 +164,12 @@ final class PedidoMail
         $html .= '<p style="margin:0 0 22px;font-size:13px;color:#5C6B61">' . e($frete['prazo']) . '</p>';
 
         return $html;
+    }
+
+    /** @param array<string, mixed> $pedido */
+    private static function soDigital(array $pedido): bool
+    {
+        return empty($pedido['endereco']) && (float) ($pedido['frete'] ?? 0) < 0.01;
     }
 
     private static function cta(string $rotulo, string $href): string

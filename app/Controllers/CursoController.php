@@ -12,13 +12,15 @@ use App\Core\Session;
 use App\Models\Curso;
 use App\Models\FaqCurso;
 use App\Models\ModuloCurso;
-use App\Models\Produto;
 
 final class CursoController extends Controller
 {
     public function index(Request $request, array $params = []): never
     {
         $curso = Curso::firstWhere('status', 'ativo');
+        if ($curso) {
+            Curso::garantirProduto($curso);
+        }
         $modulos = $curso ? ModuloCurso::where('curso_id', (int) $curso['id'], 'ordem ASC') : [];
         $faqs = $curso ? FaqCurso::where('curso_id', (int) $curso['id'], 'ordem ASC') : [];
 
@@ -42,11 +44,14 @@ final class CursoController extends Controller
             redirect('/curso');
         }
 
-        $kit = Produto::firstWhere('slug', 'kit-ritual-matinal');
-        if ($kit) {
-            Cart::add((int) $kit['id'], 1);
+        $produto = Curso::garantirProduto($curso);
+        if (!$produto || ($produto['status'] ?? '') !== 'ativo') {
+            Session::setFlash('error', 'A matrícula não está aberta neste momento.');
+            redirect('/curso');
         }
-        Session::setFlash('success', 'A matrícula será confirmada no checkout. O kit ritual acompanha o início — ajuste o carrinho se preferir apenas o curso.');
+
+        Cart::update((int) $produto['id'], 1);
+        Session::setFlash('success', $produto['nome'] . ' entrou na sacola. Conclua o pagamento para confirmar a matrícula.');
         Session::set('curso_matricula', (int) $curso['id']);
         redirect('/checkout');
     }

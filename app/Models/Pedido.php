@@ -161,6 +161,10 @@ final class Pedido extends Model
             if ($produtoId < 1) {
                 continue;
             }
+            $produto = Produto::find($produtoId);
+            if (produto_digital($produto)) {
+                continue;
+            }
             Database::query(
                 'UPDATE produtos SET estoque = estoque + :q WHERE id = :id',
                 ['q' => (int) $item['quantidade'], 'id' => $produtoId]

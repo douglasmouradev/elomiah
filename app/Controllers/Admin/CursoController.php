@@ -41,6 +41,8 @@ final class CursoController extends Controller
             'preco' => (float) str_replace(',', '.', (string) ($data['preco'] ?? $curso['preco'])),
             'status' => in_array($data['status'] ?? '', ['ativo', 'inativo'], true) ? $data['status'] : 'ativo',
         ]);
+        $atualizado = Curso::find((int) $curso['id']);
+        Curso::garantirProduto($atualizado);
 
         $titulos = $data['modulo_titulo'] ?? [];
         $descs = $data['modulo_desc'] ?? [];

@@ -103,6 +103,6 @@ View::partial('partials/flash');
             <p class="course-price"><?= e(money($curso['preco'] ?? 497)) ?></p>
             <a class="btn btn-gold" href="<?= e(url('/curso')) ?>">Conhecer o curso</a>
         </div>
-        <img src="<?= e(asset('images/geo-real.webp')) ?>" alt="Geo, fundadora da Elomiah" loading="lazy">
+        <img src="<?= e(asset('images/still-sagrado.webp')) ?>" alt="Névoa Elomiah no ateliê" loading="lazy">
     </div>
 </section>

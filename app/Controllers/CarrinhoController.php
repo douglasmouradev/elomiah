@@ -14,8 +14,8 @@ final class CarrinhoController extends Controller
 {
     public function index(Request $request, array $params = []): never
     {
-        $frete = \App\Models\Configuracao::frete();
         $carrinho = Cart::detailed();
+        $frete = frete_do_carrinho($carrinho);
         $this->view('carrinho/index', [
             'title' => 'Sacola — Elomiah',
             'carrinho' => $carrinho,

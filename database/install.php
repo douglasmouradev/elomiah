@@ -43,7 +43,5 @@ $runFile($pdo, __DIR__ . DIRECTORY_SEPARATOR . 'schema.sql');
 $runFile($pdo, __DIR__ . DIRECTORY_SEPARATOR . 'seed.sql');
 
 echo "Banco '{$cfg['name']}' criado e alimentado.\n";
-echo "Admin: admin@elomiah.com\n";
-echo "Senha:  Elomiah@2026\n";
-echo "Altere a senha após o primeiro acesso.\n";
+echo "Ateliê: http://localhost:8000/admin — e-mail do seed. Troque a senha em /admin/conta.\n";
 echo "Suba o site: php -S localhost:8000 -t public public/router.php\n";

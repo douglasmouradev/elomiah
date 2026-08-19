@@ -133,3 +133,17 @@ $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
     </div>
 </section>
 <?php endif; ?>
+<script type="application/ld+json"><?= json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'Product',
+    'name' => $produto['nome'] ?? '',
+    'description' => $produto['descricao_curta'] ?? '',
+    'image' => $ogImage ?? asset($principal['caminho'] ?? ''),
+    'brand' => ['@type' => 'Brand', 'name' => 'Elomiah'],
+    'offers' => [
+        '@type' => 'Offer',
+        'priceCurrency' => 'BRL',
+        'price' => (string) ($produto['preco_promocional'] ?: $produto['preco'] ?? '0'),
+        'availability' => !empty($disponivel) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>

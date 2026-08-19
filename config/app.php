@@ -29,5 +29,6 @@ return [
         'checkout' => ['max' => 10, 'window' => 600],
         'lgpd' => ['max' => 3, 'window' => 3600],
         'depoimento' => ['max' => 3, 'window' => 3600],
+        'recuperar' => ['max' => 3, 'window' => 3600],
     ],
 ];

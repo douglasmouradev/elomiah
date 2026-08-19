@@ -58,12 +58,11 @@ Aponte o DocumentRoot para a pasta `public/`. O arquivo `public/.htaccess` já r
 ## 4. Acesso administrativo
 
 - URL: [http://localhost:8000/admin](http://localhost:8000/admin)
-- E-mail: `admin@elomiah.com`
-- Senha: `Elomiah@2026`
+- E-mail inicial: o definido em `database/seed.sql`
 
-**Altere essa senha no primeiro acesso.** O login bloqueia a conta após 5 tentativas (15 minutos) e aplica rate limiting por IP.
+**Troque a senha no primeiro acesso** em [http://localhost:8000/admin/conta](http://localhost:8000/admin/conta). Não publique senha em README nem no GitHub. O login bloqueia a conta após 5 tentativas (15 minutos) e aplica rate limiting por IP.
 
-No painel: dashboard com Chart.js, CRUD de produtos (**+ Adicionar novo produto**), pedidos, moderação de depoimentos, edição do curso e log de auditoria.
+No painel: dashboard com Chart.js, CRUD de produtos (**+ Adicionar novo produto**), pedidos, moderação de depoimentos, edição do curso, pagamento e log de auditoria.
 
 ## 5. Pagamento
 

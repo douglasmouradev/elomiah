@@ -21,8 +21,14 @@ final class Produto extends Model
         $params = ['status' => 'ativo'];
 
         if (!empty($filters['categoria'])) {
+            if ($filters['categoria'] === 'formacao') {
+                return [];
+            }
             $sql .= ' AND c.slug = :cat';
             $params['cat'] = $filters['categoria'];
+        } else {
+            $sql .= ' AND (c.slug IS NULL OR c.slug <> :formacao)';
+            $params['formacao'] = 'formacao';
         }
         if (!empty($filters['achadinho'])) {
             $sql .= ' AND p.achadinho_geo = 1';

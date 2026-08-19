@@ -12,7 +12,6 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
 use App\Core\Validator;
-use App\Models\Configuracao;
 use App\Models\ConsentimentoLgpd;
 use App\Models\Endereco;
 use App\Models\ItemPedido;
@@ -34,9 +33,10 @@ final class CheckoutController extends Controller
             redirect('/loja');
         }
 
-        $frete = Configuracao::frete();
         $user = Auth::user();
-        $endereco = Endereco::ultimoDoCliente((int) Auth::id());
+        $requerEnvio = carrinho_requer_envio($carrinho);
+        $endereco = $requerEnvio ? Endereco::ultimoDoCliente((int) Auth::id()) : null;
+        $frete = frete_do_carrinho($carrinho);
         $total = $carrinho['total'] + $frete['valor'];
 
         $this->view('checkout/index', [
@@ -47,6 +47,7 @@ final class CheckoutController extends Controller
             'total' => $total,
             'user' => $user,
             'endereco' => $endereco,
+            'requerEnvio' => $requerEnvio,
             'mpPronto' => MercadoPago::configurado(),
             'pixPronto' => Pix::configurado(),
         ]);
@@ -65,19 +66,25 @@ final class CheckoutController extends Controller
         }
 
         $data = Validator::sanitize($request->all());
-        $errors = Validator::make($data, [
+        $requerEnvio = carrinho_requer_envio($carrinho);
+        $regras = [
             'nome' => 'required|min:3|max:120',
             'email' => 'required|email',
             'telefone' => 'required|min:10|max:20',
-            'cep' => 'required|cep',
-            'logradouro' => 'required|max:180',
-            'numero' => 'required|max:20',
-            'bairro' => 'required|max:120',
-            'cidade' => 'required|max:120',
-            'estado' => 'required|max:2',
             'lgpd' => 'required',
             'metodo_pagamento' => 'required|in:pix,cartao',
-        ]);
+        ];
+        if ($requerEnvio) {
+            $regras = array_merge($regras, [
+                'cep' => 'required|cep',
+                'logradouro' => 'required|max:180',
+                'numero' => 'required|max:20',
+                'bairro' => 'required|max:120',
+                'cidade' => 'required|max:120',
+                'estado' => 'required|max:2',
+            ]);
+        }
+        $errors = Validator::make($data, $regras);
 
         $metodo = (string) ($data['metodo_pagamento'] ?? 'pix');
 
@@ -99,19 +106,22 @@ final class CheckoutController extends Controller
             redirect('/checkout');
         }
 
-        $cep = preg_replace('/\D+/', '', (string) $data['cep']) ?? '';
-        $enderecoId = Endereco::create([
-            'usuario_id' => Auth::id(),
-            'cep' => $cep,
-            'logradouro' => $data['logradouro'],
-            'numero' => $data['numero'],
-            'complemento' => $data['complemento'] ?? null,
-            'bairro' => $data['bairro'],
-            'cidade' => $data['cidade'],
-            'estado' => strtoupper((string) $data['estado']),
-        ]);
+        $enderecoId = null;
+        if ($requerEnvio) {
+            $cep = preg_replace('/\D+/', '', (string) $data['cep']) ?? '';
+            $enderecoId = Endereco::create([
+                'usuario_id' => Auth::id(),
+                'cep' => $cep,
+                'logradouro' => $data['logradouro'],
+                'numero' => $data['numero'],
+                'complemento' => $data['complemento'] ?? null,
+                'bairro' => $data['bairro'],
+                'cidade' => $data['cidade'],
+                'estado' => strtoupper((string) $data['estado']),
+            ]);
+        }
 
-        $frete = Configuracao::frete()['valor'];
+        $frete = frete_do_carrinho($carrinho)['valor'];
         $codigo = 'ELO-' . strtoupper(bin2hex(random_bytes(4)));
 
         $pedidoId = Pedido::create([
@@ -139,8 +149,10 @@ final class CheckoutController extends Controller
                 'preco_unitario' => $item['preco'],
                 'subtotal' => $item['subtotal'],
             ]);
-            $estoque = max(0, (int) $item['produto']['estoque'] - $item['qty']);
-            Produto::updateById((int) $item['produto']['id'], ['estoque' => $estoque]);
+            if (!produto_digital($item['produto'])) {
+                $estoque = max(0, (int) $item['produto']['estoque'] - $item['qty']);
+                Produto::updateById((int) $item['produto']['id'], ['estoque' => $estoque]);
+            }
         }
 
         ConsentimentoLgpd::create([

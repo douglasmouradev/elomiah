@@ -4,27 +4,29 @@ $user = $user ?? null;
 $carrinho = $carrinho ?? ['items' => []];
 $mpPronto = !empty($mpPronto);
 $endereco = $endereco ?? null;
+$requerEnvio = $requerEnvio ?? carrinho_requer_envio($carrinho);
 $freteInfo = $freteInfo ?? frete();
 ?>
 <section class="page-hero container">
     <p class="eyebrow">Fechamento</p>
     <h1>Checkout</h1>
-    <p class="lede lede-center">A compra fica nesta conta. Depois você acompanha o envio e o rastreio em Pedidos.</p>
+    <p class="lede lede-center"><?= $requerEnvio ? 'A compra fica nesta conta. Depois você acompanha o envio e o rastreio em Pedidos.' : 'A matrícula fica nesta conta. O acesso chega por e-mail depois do pagamento.' ?></p>
 </section>
 <section class="container checkout-layout">
     <form class="form" method="post" action="<?= e(url('/checkout')) ?>" data-checkout>
         <?= csrf_field() ?>
         <ol class="checkout-steps" aria-label="Etapas">
-            <li data-step-label="1">Destino</li>
+            <li data-step-label="1"><?= $requerEnvio ? 'Destino' : 'Seus dados' ?></li>
             <li data-step-label="2">Pagamento</li>
         </ol>
 
         <div data-step="1">
-            <h2>Quem recebe</h2>
+            <h2><?= $requerEnvio ? 'Quem recebe' : 'Quem se matricula' ?></h2>
             <label><span>Nome</span><input type="text" name="nome" value="<?= e((string) old('nome', $user['nome'] ?? '')) ?>" required></label>
             <label><span>E-mail</span><input type="email" name="email" value="<?= e((string) old('email', $user['email'] ?? '')) ?>" required></label>
             <label><span>Telefone</span><input type="tel" name="telefone" value="<?= e((string) old('telefone', $user['telefone'] ?? '')) ?>" required></label>
 
+            <?php if ($requerEnvio): ?>
             <h2 class="form-block">Endereço</h2>
             <?php if ($endereco): ?>
                 <p class="field-hint">Preenchemos com o último destino desta conta. Altere se o envio for para outro lugar.</p>
@@ -43,12 +45,15 @@ $freteInfo = $freteInfo ?? frete();
                 <label><span>Cidade</span><input type="text" name="cidade" id="cidade" value="<?= e((string) old('cidade', $endereco['cidade'] ?? '')) ?>" required></label>
                 <label><span>Estado</span><input type="text" name="estado" id="estado" maxlength="2" value="<?= e((string) old('estado', $endereco['estado'] ?? '')) ?>" required></label>
             </div>
+            <?php else: ?>
+            <p class="field-hint">Formação digital: sem despacho. O acesso chega neste e-mail depois do pagamento.</p>
+            <?php endif; ?>
             <label><span>Observações</span><textarea name="observacoes"><?= e((string) old('observacoes')) ?></textarea></label>
             <button class="btn btn-gold" type="button" data-to-pay>Continuar para o pagamento</button>
         </div>
 
         <div data-step="2">
-            <button class="text-back" type="button" data-to-dest>Voltar ao destino</button>
+            <button class="text-back" type="button" data-to-dest><?= $requerEnvio ? 'Voltar ao destino' : 'Voltar aos dados' ?></button>
             <h2>Pagamento</h2>
             <?php
             $metodo = (string) old('metodo_pagamento', 'pix');

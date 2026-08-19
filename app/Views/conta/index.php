@@ -11,6 +11,23 @@ $pedidos = $pedidos ?? [];
 <section class="container account-page">
     <p class="account-hello">Olá, <?= e((string) ($usuario['nome'] ?? '')) ?>.</p>
 
+    <article class="account-address">
+        <p class="eyebrow">Seus dados</p>
+        <form class="form" method="post" action="<?= e(url('/conta/perfil')) ?>">
+            <?= csrf_field() ?>
+            <label><span>Nome</span><input type="text" name="nome" value="<?= e((string) ($usuario['nome'] ?? '')) ?>" required></label>
+            <label><span>Telefone</span><input type="tel" name="telefone" value="<?= e((string) ($usuario['telefone'] ?? '')) ?>" required></label>
+            <button class="btn btn-ghost" type="submit">Guardar dados</button>
+        </form>
+        <form class="form" method="post" action="<?= e(url('/conta/senha')) ?>" style="margin-top:1.4rem">
+            <?= csrf_field() ?>
+            <label><span>Senha atual</span><input type="password" name="senha_atual" required autocomplete="current-password"></label>
+            <label><span>Nova senha</span><input type="password" name="senha" required minlength="8" autocomplete="new-password"></label>
+            <label><span>Confirmar</span><input type="password" name="senha_confirmation" required minlength="8" autocomplete="new-password"></label>
+            <button class="btn btn-ghost" type="submit">Trocar senha</button>
+        </form>
+    </article>
+
     <?php $endereco = $endereco ?? null; $freteInfo = frete(); ?>
     <article class="account-address">
         <p class="eyebrow">Endereço de envio</p>

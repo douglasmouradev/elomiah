@@ -27,4 +27,11 @@ $dado = $p['volume'] ?? $p['colecao'] ?? $p['categoria_nome'] ?? '';
             <?php endif; ?>
         </span>
     </div>
+    <?php if (($p['compra_tipo'] ?? 'carrinho') === 'carrinho' && (int) ($p['estoque'] ?? 0) > 0 && !produto_digital($p)): ?>
+        <form method="post" action="<?= e(url('/carrinho/adicionar')) ?>" class="card-add">
+            <?= csrf_field() ?>
+            <input type="hidden" name="produto_id" value="<?= (int) $p['id'] ?>">
+            <button type="submit">À sacola</button>
+        </form>
+    <?php endif; ?>
 </article>

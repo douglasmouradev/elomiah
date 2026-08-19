@@ -8,7 +8,8 @@ INSERT INTO `categorias` (`nome`, `slug`, `descricao`, `ordem`) VALUES
 ('Coleção Refúgio', 'colecao-refugio', 'Sprays de ambiente 120 ml', 1),
 ('Coleção Elo', 'colecao-elo', 'Home spray para os primeiros capítulos', 2),
 ('Difusor', 'difusor', 'Presença contínua no ambiente', 3),
-('Kits', 'kits', 'Rituais completos', 4);
+('Kits', 'kits', 'Rituais completos', 4),
+('Formação', 'formacao', 'Cursos com a Geo', 9);
 
 INSERT INTO `produtos`
 (`categoria_id`,`nome`,`slug`,`descricao`,`descricao_curta`,`preco`,`preco_promocional`,`estoque`,`sku`,`volume`,`notas_topo`,`notas_coracao`,`notas_fundo`,`ficha_tecnica`,`cor_destaque`,`aroma`,`citacao`,`colecao`,`modo_usar`,`precaucoes`,`destaque`,`achadinho_geo`,`status`,`compra_tipo`,`url_shopee`,`url_amazon`,`url_mercadolivre`)
@@ -101,7 +102,17 @@ VALUES
 'Coleção Elo',
 'Borrife no ar ou em tecidos a cerca de 20 cm de distância.',
 'Manter fora do alcance de crianças. Inflamável. Evite contato com os olhos.',
-1, 0, 'ativo', 'carrinho', 'https://collshp.com/geovanaferreira030789?view=storefront', 'https://amazon.com.br', 'https://mercadolivre.com.br');
+1, 0, 'ativo', 'carrinho', 'https://collshp.com/geovanaferreira030789?view=storefront', 'https://amazon.com.br', 'https://mercadolivre.com.br'),
+
+(5,'O Ritual das Essências','o-ritual-das-essencias',
+'Um curso íntimo com a Geo: olfato, composição de ambiente e o hábito de consagrar o espaço. Seis módulos gravados, caderno de práticas e um encontro ao vivo por turma.',
+'Formação com a Geo. Acesso por 12 meses.',
+497.00, NULL, 999, 'ELO-CURSO', 'Acesso 12 meses',
+NULL, NULL, NULL, NULL,
+'#1B4332', NULL, NULL,
+'Formação',
+NULL, NULL,
+0, 0, 'ativo', 'carrinho', NULL, NULL, NULL);
 
 INSERT INTO `imagens_produto` (`produto_id`, `caminho`, `alt`, `ordem`) VALUES
 (1, 'images/frasco-despertar.webp', 'Despertar — spray manga verde', 1),
@@ -115,7 +126,8 @@ INSERT INTO `imagens_produto` (`produto_id`, `caminho`, `alt`, `ordem`) VALUES
 (5, 'images/frasco-silencio.webp', 'Silêncio — spray âmbar', 1),
 (5, 'images/ficha-silencio.webp', 'Silêncio — ficha', 2),
 (6, 'images/frasco-elo.webp', 'Elo — home spray', 1),
-(6, 'images/ficha-elo.webp', 'Elo — ficha', 2);
+(6, 'images/ficha-elo.webp', 'Elo — ficha', 2),
+(7, 'images/still-sagrado.webp', 'O Ritual das Essências', 1);
 
 INSERT INTO `depoimentos` (`usuario_id`, `produto_id`, `nome`, `nota`, `texto`, `status`) VALUES
 (NULL, 1, 'Marina S.', 5, 'Despertar mudou o tom da manhã. Manga verde, sem doçura de vitrine. A casa acorda comigo.', 'aprovado'),
