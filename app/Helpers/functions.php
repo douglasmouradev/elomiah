@@ -204,11 +204,6 @@ function whatsapp_url(string $message = ''): string
     return 'https://wa.me/' . $number . $q;
 }
 
-function achadinhos_url(): string
-{
-    return (string) (config('app')['achadinhos_url'] ?? 'https://collshp.com/geovanaferreira030789?view=storefront');
-}
-
 function shopee_url(): string
 {
     return (string) (config('app')['shopee_url'] ?? 'https://collshp.com/geovanaferreira030789?view=storefront');

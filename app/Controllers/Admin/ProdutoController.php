@@ -122,7 +122,7 @@ final class ProdutoController extends Controller
             'modo_usar' => $data['modo_usar'] ?? null,
             'precaucoes' => $data['precaucoes'] ?? null,
             'destaque' => isset($data['destaque']) ? 1 : 0,
-            'achadinho_geo' => isset($data['achadinho_geo']) ? 1 : 0,
+            'achadinho_geo' => 0,
             'status' => in_array($data['status'] ?? '', ['ativo', 'inativo'], true) ? $data['status'] : 'ativo',
             'compra_tipo' => in_array($data['compra_tipo'] ?? '', ['carrinho', 'shopee', 'amazon', 'mercadolivre'], true)
                 ? $data['compra_tipo'] : 'carrinho',

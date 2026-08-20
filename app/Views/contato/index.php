@@ -18,7 +18,6 @@
         <h2>Outros caminhos</h2>
         <p><a class="btn btn-ghost" href="<?= e(whatsapp_url('Olá, vim pelo site da Elomiah.')) ?>" target="_blank" rel="noopener">WhatsApp</a></p>
         <p><a href="https://instagram.com/elomiah" target="_blank" rel="noopener">Instagram @elomiah</a></p>
-        <p><a href="<?= e(achadinhos_url()) ?>" target="_blank" rel="noopener noreferrer">Vitrine da Geo</a></p>
         <p style="margin-top:2rem;color:var(--cinza)">Para exercer seus direitos de titular (acesso, correção, exclusão, portabilidade), use também a página <a href="<?= e(url('/meus-dados')) ?>">Seus dados</a>.</p>
     </aside>
 </section>

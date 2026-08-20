@@ -117,11 +117,10 @@ storage/logs      Log de erros
 
 | Rota | Conteúdo |
 |---|---|
-| `/` | Home com hero, spray 3D, vitrine, depoimentos, achadinhos, marketplaces |
+| `/` | Home com hero, spray 3D, vitrine, depoimentos, curso |
 | `/loja` | Grid com filtro de categoria e ordenação |
 | `/produto/{slug}` | Galeria com zoom, notas olfativas, compra interna ou marketplace |
 | `/curso` | Landing do curso |
-| `/achadinhos` | Curadoria da Geo |
 | `/sobre` | Bio da marca e da Geo |
 | `/depoimentos` | Grid + envio para moderação |
 | `/checkout` | Sacola + CEP + Pix ou cartão no Mercado Pago + LGPD |

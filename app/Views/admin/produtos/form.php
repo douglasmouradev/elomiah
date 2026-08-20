@@ -48,7 +48,6 @@ $old = fn(string $k, $d = '') => old($k, $p[$k] ?? $d);
     <label class="full"><span>URL Amazon</span><input type="url" name="url_amazon" value="<?= e((string) $old('url_amazon')) ?>"></label>
     <label class="full"><span>URL Mercado Livre</span><input type="url" name="url_mercadolivre" value="<?= e((string) $old('url_mercadolivre')) ?>"></label>
     <label><span><input type="checkbox" name="destaque" <?= $old('destaque') ? 'checked' : '' ?>> Destacar na home</span></label>
-    <label><span><input type="checkbox" name="achadinho_geo" <?= $old('achadinho_geo') ? 'checked' : '' ?>> Achadinho da Geo</span></label>
     <label class="full"><span>Imagens (múltiplas)</span>
         <input type="file" name="imagens[]" id="imagens" accept="image/jpeg,image/png,image/webp" multiple>
         <div class="previews" id="previews">

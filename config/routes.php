@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Controllers\AchadinhosController;
 use App\Controllers\Admin\AuthController as AdminAuthController;
 use App\Controllers\Admin\ContatoController as AdminContatoController;
 use App\Controllers\Admin\CursoController as AdminCursoController;
@@ -37,7 +36,6 @@ return static function (Router $router): void {
     $router->get('/produto/{slug}', [ProdutoController::class, 'show']);
     $router->get('/curso', [CursoController::class, 'index']);
     $router->post('/curso/matricular', [CursoController::class, 'matricular']);
-    $router->get('/achadinhos', [AchadinhosController::class, 'index']);
     $router->get('/sobre', [SobreController::class, 'index']);
     $router->get('/depoimentos', [DepoimentosController::class, 'index']);
     $router->post('/depoimentos', [DepoimentosController::class, 'store']);

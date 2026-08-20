@@ -363,14 +363,6 @@ h1, h2, h3, .display {
   text-transform: uppercase;
   color: var(--dourado);
 }
-.achadinhos-banner img,
-.achadinhos-hero img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.achadinhos-hero { padding: 0; }
-.achadinhos-home { padding-top: 4rem; }
 .hero-mist {
   position: absolute;
   inset: 0;
@@ -464,18 +456,6 @@ section { padding: 6.5rem 0; }
   filter: drop-shadow(0 18px 24px rgba(15,44,34,.18));
 }
 .product-card:hover .thumb img { transform: scale(1.03); }
-.badge-geo {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  border: 1px solid var(--dourado);
-  color: var(--verde);
-  background: color-mix(in srgb, var(--creme) 80%, transparent);
-  padding: 0.35rem 0.55rem;
-}
 .product-card h3 {
   font-size: 1.25rem;
   margin: 0;

@@ -7,9 +7,6 @@ $dado = $p['volume'] ?? $p['colecao'] ?? $p['categoria_nome'] ?? '';
 ?>
 <article class="product-card">
     <a class="thumb" href="<?= e(url('/produto/' . $p['slug'])) ?>">
-        <?php if (!empty($p['achadinho_geo'])): ?>
-            <span class="badge-geo">Achadinho da Geo</span>
-        <?php endif; ?>
         <img src="<?= e(asset($img)) ?>" alt="<?= e($p['nome']) ?>" loading="lazy">
     </a>
     <p class="product-band" style="background:<?= e((string) $cor) ?>"><?= e($p['nome']) ?></p>

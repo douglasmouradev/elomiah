@@ -78,7 +78,7 @@ $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
                 default => $produto['url_mercadolivre'] ?? '',
             };
             $rotulo = match ($compraTipo) {
-                'shopee' => 'Comprar na vitrine da Geo',
+                'shopee' => 'Comprar na Shopee',
                 'amazon' => 'Comprar na Amazon',
                 default => 'Comprar no Mercado Livre',
             };

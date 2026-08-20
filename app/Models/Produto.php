@@ -30,9 +30,6 @@ final class Produto extends Model
             $sql .= ' AND (c.slug IS NULL OR c.slug <> :formacao)';
             $params['formacao'] = 'formacao';
         }
-        if (!empty($filters['achadinho'])) {
-            $sql .= ' AND p.achadinho_geo = 1';
-        }
         if (!empty($filters['destaque'])) {
             $sql .= ' AND p.destaque = 1';
         }

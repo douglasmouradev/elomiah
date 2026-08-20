@@ -14,7 +14,7 @@
                     <img class="thumb-sm" src="<?= e(asset($p['imagem'])) ?>" alt="">
                 <?php endif; ?>
             </td>
-            <td><?= e($p['nome']) ?><?php if ($p['destaque']): ?> · destaque<?php endif; ?><?php if ($p['achadinho_geo']): ?> · achadinho<?php endif; ?></td>
+            <td><?= e($p['nome']) ?><?php if ($p['destaque']): ?> · destaque<?php endif; ?></td>
             <td><?= e($p['categoria_nome'] ?? '') ?></td>
             <td><?= e(money($p['preco'])) ?></td>
             <td><?= (int) $p['estoque'] ?></td>

@@ -9,7 +9,6 @@ return [
     'url' => rtrim((string) env('APP_URL', 'http://localhost:8000'), '/'),
     'key' => (string) env('APP_KEY', ''),
     'whatsapp' => preg_replace('/\D+/', '', (string) env('WHATSAPP', '5571984916767')) ?: '5571984916767',
-    'achadinhos_url' => (string) env('ACHADINHOS_URL', 'https://collshp.com/geovanaferreira030789?view=storefront'),
     'shopee_url' => (string) env('SHOPEE_URL', 'https://collshp.com/geovanaferreira030789?view=storefront'),
     'mercadopago_access_token' => (string) env('MERCADOPAGO_ACCESS_TOKEN', ''),
     'mercadopago_public_key' => (string) env('MERCADOPAGO_PUBLIC_KEY', ''),

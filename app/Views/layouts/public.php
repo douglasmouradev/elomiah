@@ -77,7 +77,6 @@
             <ul>
                 <li><a href="<?= e(url('/loja')) ?>">A loja</a></li>
                 <li><a href="<?= e(url('/curso')) ?>">O Ritual das Essências</a></li>
-                <li><a href="<?= e(url('/achadinhos')) ?>">Achadinhos da Geo</a></li>
                 <li><a href="<?= e(url('/depoimentos')) ?>">Depoimentos</a></li>
                 <li><a href="<?= e(url('/sobre')) ?>">A marca e a Geo</a></li>
             </ul>
@@ -97,7 +96,6 @@
             <ul>
                 <li><a href="https://instagram.com/elomiah" rel="noopener" target="_blank">Instagram</a></li>
                 <li><a href="<?= e(whatsapp_url('Olá, vim pelo site da Elomiah.')) ?>" rel="noopener" target="_blank">WhatsApp</a></li>
-                <li><a href="<?= e(achadinhos_url()) ?>" target="_blank" rel="noopener noreferrer">Vitrine da Geo</a></li>
             </ul>
         </div>
     </div>
