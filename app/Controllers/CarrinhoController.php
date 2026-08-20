@@ -46,6 +46,16 @@ final class CarrinhoController extends Controller
             }
         }
 
+        $teto = Cart::teto($id);
+        if ($teto < 1) {
+            Session::setFlash('error', $produto['nome'] . ' está esgotado.');
+            $this->back('/loja');
+        }
+        if (Cart::qty($id) + $qty > $teto) {
+            Session::setFlash('error', 'Só restam ' . $teto . ' unidades de ' . $produto['nome'] . '.');
+            $this->back('/carrinho');
+        }
+
         Cart::add($id, $qty);
         Session::setFlash('success', $produto['nome'] . ' entrou na sacola.');
         redirect('/carrinho');

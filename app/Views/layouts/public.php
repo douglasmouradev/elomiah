@@ -107,7 +107,7 @@
     </div>
 </footer>
 
-<div class="cookie-banner" role="dialog" aria-label="Cookies">
+<div class="cookie-banner<?= cookie_consentimento() === '' ? ' is-on' : '' ?>" role="dialog" aria-label="Cookies">
     <p>Usamos cookies essenciais para o funcionamento da loja. Os demais — métricas discretas — só entram com o seu aceite. Leia a <a href="<?= e(url('/privacidade')) ?>">Política de Privacidade</a>.</p>
     <div class="cookie-actions">
         <button class="btn btn-gold" type="button" data-cookie="todos">Aceitar</button>

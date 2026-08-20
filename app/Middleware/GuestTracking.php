@@ -24,6 +24,9 @@ final class GuestTracking
         if ($request->method() !== 'GET') {
             return;
         }
+        if (cookie_consentimento() !== 'todos') {
+            return;
+        }
 
         try {
             Database::insert('visitantes', [

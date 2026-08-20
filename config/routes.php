@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 use App\Controllers\AchadinhosController;
 use App\Controllers\Admin\AuthController as AdminAuthController;
+use App\Controllers\Admin\ContatoController as AdminContatoController;
 use App\Controllers\Admin\CursoController as AdminCursoController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\DepoimentoController as AdminDepoimentoController;
 use App\Controllers\Admin\FinanceiroController as AdminFinanceiroController;
+use App\Controllers\Admin\LgpdController as AdminLgpdController;
 use App\Controllers\Admin\LogController;
 use App\Controllers\Admin\NotificacaoController as AdminNotificacaoController;
 use App\Controllers\Admin\PedidoController as AdminPedidoController;
@@ -51,6 +53,7 @@ return static function (Router $router): void {
     $router->get('/checkout', [CheckoutController::class, 'index'], $conta);
     $router->post('/checkout', [CheckoutController::class, 'store'], $conta);
     $router->get('/pedido/{codigo}/status', [CheckoutController::class, 'status']);
+    $router->get('/pedido/{codigo}/nota', [CheckoutController::class, 'nota']);
     $router->post('/pedido/{codigo}/pagar', [CheckoutController::class, 'pagarCartao']);
     $router->get('/pedido/{codigo}', [CheckoutController::class, 'obrigado']);
     $router->get('/pagamento/retorno', [PagamentoController::class, 'retorno']);
@@ -71,6 +74,8 @@ return static function (Router $router): void {
     $router->post('/conta/perfil', [ContaController::class, 'perfil'], $conta);
     $router->post('/conta/senha', [ContaController::class, 'senha'], $conta);
     $router->get('/conta/pedidos/{codigo}', [ContaController::class, 'pedido'], $conta);
+    $router->post('/conta/pedidos/{codigo}/cancelar', [ContaController::class, 'cancelar'], $conta);
+    $router->get('/conta/curso', [ContaController::class, 'curso'], $conta);
 
     $router->get('/privacidade', [LgpdController::class, 'privacidade']);
     $router->get('/termos', [LgpdController::class, 'termos']);
@@ -108,8 +113,17 @@ return static function (Router $router): void {
     $router->get('/admin/curso', [AdminCursoController::class, 'edit'], $admin);
     $router->post('/admin/curso', [AdminCursoController::class, 'update'], $admin);
 
+    $router->get('/admin/contato', [AdminContatoController::class, 'index'], $admin);
+    $router->post('/admin/contato/{id}/lida', [AdminContatoController::class, 'lida'], $admin);
+
+    $router->get('/admin/lgpd', [AdminLgpdController::class, 'index'], $admin);
+    $router->post('/admin/lgpd/{id}/atender', [AdminLgpdController::class, 'atender'], $admin);
+
     $router->get('/admin/pagamento', [AdminFinanceiroController::class, 'edit'], $admin);
     $router->post('/admin/pagamento', [AdminFinanceiroController::class, 'update'], $admin);
+    $router->post('/admin/despacho', [AdminFinanceiroController::class, 'despacho'], $admin);
+    $router->post('/admin/pix', [AdminFinanceiroController::class, 'pix'], $admin);
+    $router->post('/admin/loja', [AdminFinanceiroController::class, 'loja'], $admin);
 
     $router->get('/admin/logs', [LogController::class, 'index'], $admin);
 };

@@ -48,6 +48,19 @@ final class ContatoController extends Controller
             'mensagem' => $data['mensagem'],
         ]);
 
+        \App\Models\Notificacao::criar(
+            'contato',
+            'Mensagem de ' . $data['nome'],
+            mb_substr((string) ($data['assunto'] ?? 'Contato pelo site'), 0, 80),
+            '/admin/contato'
+        );
+        \App\Support\ContatoMail::aviso([
+            'nome' => $data['nome'],
+            'email' => $data['email'],
+            'assunto' => $data['assunto'] ?? 'Contato pelo site',
+            'mensagem' => $data['mensagem'],
+        ]);
+
         RateLimiter::hit('contato');
         Session::setFlash('success', 'Recebemos sua mensagem. Respondemos com a mesma calma com que formulamos.');
         redirect('/contato');

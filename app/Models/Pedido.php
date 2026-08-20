@@ -18,7 +18,11 @@ final class Pedido extends Model
             return null;
         }
         $pedido['itens'] = Database::fetchAll(
-            'SELECT * FROM itens_pedido WHERE pedido_id = :id',
+            'SELECT i.*, p.sku, p.slug, c.slug AS categoria_slug
+             FROM itens_pedido i
+             LEFT JOIN produtos p ON p.id = i.produto_id
+             LEFT JOIN categorias c ON c.id = p.categoria_id
+             WHERE i.pedido_id = :id',
             ['id' => $id]
         );
         $pedido['usuario'] = $pedido['usuario_id']
@@ -100,6 +104,22 @@ final class Pedido extends Model
         return true;
     }
 
+    /** Cancela pedidos pendentes antigos e devolve o estoque físico. */
+    public static function expirarPendentes(int $horas = 24): int
+    {
+        self::garantirColunas();
+        $limite = date('Y-m-d H:i:s', time() - max(1, $horas) * 3600);
+        $rows = Database::fetchAll(
+            'SELECT id FROM pedidos WHERE status = :s AND created_at < :t ORDER BY id ASC LIMIT 30',
+            ['s' => 'pendente', 't' => $limite]
+        );
+        foreach ($rows as $row) {
+            self::mudarStatus((int) $row['id'], 'cancelado');
+        }
+
+        return count($rows);
+    }
+
     public static function doCliente(int $usuarioId): array
     {
         self::garantirColunas();
@@ -141,10 +161,13 @@ final class Pedido extends Model
     {
         return Database::fetchAll(
             'SELECT i.*,
+                    p.sku, p.slug, cat.slug AS categoria_slug,
                     (SELECT caminho FROM imagens_produto img
                      WHERE img.produto_id = i.produto_id
                      ORDER BY img.ordem ASC, img.id ASC LIMIT 1) AS imagem
              FROM itens_pedido i
+             LEFT JOIN produtos p ON p.id = i.produto_id
+             LEFT JOIN categorias cat ON cat.id = p.categoria_id
              WHERE i.pedido_id = :id',
             ['id' => $pedidoId]
         );

@@ -23,3 +23,63 @@ $temPublica = !empty($temPublica);
         </label>
     <?php endif; ?>
 </form>
+
+<h2 style="margin-top:2.4rem">Pix</h2>
+<?php $pix = $pix ?? ['chave' => '', 'nome' => 'ELOMIAH', 'cidade' => 'SAO PAULO']; ?>
+<p class="field-hint">Chave que aparece no QR quando o Mercado Pago não está ligado. A cliente já vê esta chave na página do pedido.</p>
+<form class="form" method="post" action="<?= e(url('/admin/pix')) ?>" style="max-width:560px">
+    <?= csrf_field() ?>
+    <label><span>Chave Pix</span>
+        <input type="text" name="pix_chave" value="<?= e((string) ($pix['chave'] ?? '')) ?>" maxlength="80" required>
+    </label>
+    <label><span>Nome no Pix</span>
+        <input type="text" name="pix_nome" value="<?= e((string) ($pix['nome'] ?? '')) ?>" maxlength="25" required>
+    </label>
+    <label><span>Cidade</span>
+        <input type="text" name="pix_cidade" value="<?= e((string) ($pix['cidade'] ?? '')) ?>" maxlength="15" required>
+    </label>
+    <p>
+        <button class="btn btn-gold" type="submit">Guardar Pix</button>
+    </p>
+</form>
+
+<h2 style="margin-top:2.4rem">Emitente do recibo</h2>
+<?php $loja = $loja ?? ['razao' => 'Elomiah', 'cnpj' => '', 'ie' => '', 'endereco' => '']; ?>
+<p class="field-hint">Aparece no recibo de compra enviado por e-mail. CNPJ e endereço são opcionais.</p>
+<form class="form" method="post" action="<?= e(url('/admin/loja')) ?>" style="max-width:560px">
+    <?= csrf_field() ?>
+    <label><span>Razão / nome</span>
+        <input type="text" name="loja_razao" value="<?= e((string) ($loja['razao'] ?? '')) ?>" maxlength="120" required>
+    </label>
+    <label><span>CNPJ</span>
+        <input type="text" name="loja_cnpj" value="<?= e((string) ($loja['cnpj'] ?? '')) ?>" maxlength="32">
+    </label>
+    <label><span>Inscrição estadual</span>
+        <input type="text" name="loja_ie" value="<?= e((string) ($loja['ie'] ?? '')) ?>" maxlength="32">
+    </label>
+    <label><span>Endereço do ateliê</span>
+        <input type="text" name="loja_endereco" value="<?= e((string) ($loja['endereco'] ?? '')) ?>" maxlength="180">
+    </label>
+    <p>
+        <button class="btn btn-gold" type="submit">Guardar emitente</button>
+    </p>
+</form>
+
+<h2 style="margin-top:2.4rem">Despacho</h2>
+<?php $frete = $frete ?? frete(); ?>
+<p class="field-hint">Valor, nome e prazo que aparecem no checkout das névoas. Formação digital não cobra este despacho.</p>
+<form class="form" method="post" action="<?= e(url('/admin/despacho')) ?>" style="max-width:560px">
+    <?= csrf_field() ?>
+    <label><span>Nome</span>
+        <input type="text" name="frete_nome" value="<?= e((string) ($frete['nome'] ?? '')) ?>" maxlength="80" required>
+    </label>
+    <label><span>Valor (R$)</span>
+        <input type="text" name="frete_padrao" value="<?= e(number_format((float) ($frete['valor'] ?? 0), 2, ',', '')) ?>" required>
+    </label>
+    <label><span>Prazo</span>
+        <input type="text" name="frete_prazo" value="<?= e((string) ($frete['prazo'] ?? '')) ?>" maxlength="180" required>
+    </label>
+    <p>
+        <button class="btn btn-gold" type="submit">Guardar despacho</button>
+    </p>
+</form>

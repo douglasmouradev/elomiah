@@ -65,6 +65,18 @@ final class CheckoutController extends Controller
             redirect('/loja');
         }
 
+        foreach ($carrinho['items'] as $item) {
+            $produto = $item['produto'];
+            if (produto_digital($produto)) {
+                continue;
+            }
+            $atual = \App\Models\Produto::find((int) $produto['id']);
+            if (!$atual || (int) ($atual['estoque'] ?? 0) < (int) $item['qty']) {
+                Session::setFlash('error', ($produto['nome'] ?? 'Um item') . ' não tem estoque suficiente. Ajuste a sacola.');
+                redirect('/carrinho');
+            }
+        }
+
         $data = Validator::sanitize($request->all());
         $requerEnvio = carrinho_requer_envio($carrinho);
         $regras = [
@@ -220,21 +232,25 @@ final class CheckoutController extends Controller
 
     public function pagarCartao(Request $request, array $params = []): never
     {
+        if (RateLimiter::tooMany('pagar_cartao')) {
+            Response::json(['ok' => false, 'message' => 'Muitas tentativas. Aguarde um pouco.'], 429);
+        }
+
         $codigo = (string) ($params['codigo'] ?? '');
         $pedido = Pedido::firstWhere('codigo', $codigo);
         if (!$pedido) {
             Response::json(['ok' => false, 'message' => 'Pedido não encontrado.'], 404);
         }
 
-        $dono = Auth::id() && (int) ($pedido['usuario_id'] ?? 0) === Auth::id();
-        $recem = Session::get('ultimo_pedido') === $codigo;
-        if (!$dono && !$recem && !Auth::isAdmin()) {
+        if (!$this->podeVerPedido($pedido, $codigo)) {
             Response::json(['ok' => false, 'message' => 'Entre na conta para pagar este pedido.'], 403);
         }
 
         if (($pedido['status'] ?? '') !== 'pendente' || ($pedido['metodo_pagamento'] ?? '') !== 'cartao') {
             Response::json(['ok' => false, 'message' => 'Este pedido não aguarda cartão.'], 422);
         }
+
+        RateLimiter::hit('pagar_cartao');
 
         $raw = file_get_contents('php://input') ?: '';
         $card = json_decode($raw, true);
@@ -266,6 +282,29 @@ final class CheckoutController extends Controller
         Response::json(['ok' => true, 'status' => $status, 'pago' => true]);
     }
 
+    public function nota(Request $request, array $params = []): never
+    {
+        $codigo = (string) ($params['codigo'] ?? '');
+        $pedido = Pedido::firstWhere('codigo', $codigo);
+        if (!$pedido) {
+            Response::abort(404, 'Pedido não encontrado.');
+        }
+
+        $pedido = Pedido::withItems((int) $pedido['id']) ?? $pedido;
+        if (!$this->podeVerPedido($pedido, $codigo)) {
+            Session::set('intended', '/pedido/' . $codigo . '/nota');
+            Session::setFlash('error', 'Entre na sua conta para ver o recibo.');
+            redirect('/entrar');
+        }
+
+        if (!\App\Support\NotaCompra::liberada($pedido)) {
+            Session::setFlash('error', 'O recibo sai por e-mail quando o pagamento entrar.');
+            redirect('/pedido/' . $codigo);
+        }
+
+        Response::html(\App\Support\NotaCompra::html($pedido, true));
+    }
+
     public function obrigado(Request $request, array $params = []): never
     {
         $codigo = (string) ($params['codigo'] ?? '');
@@ -275,11 +314,9 @@ final class CheckoutController extends Controller
         }
 
         MercadoPago::sincronizarPedidoPendente($pedido);
-        $pedido = Pedido::firstWhere('codigo', $codigo) ?? $pedido;
+        $pedido = Pedido::withItems((int) $pedido['id']) ?? $pedido;
 
-        $dono = Auth::id() && (int) ($pedido['usuario_id'] ?? 0) === Auth::id();
-        $recem = Session::get('ultimo_pedido') === $codigo;
-        if (!$dono && !$recem && !Auth::isAdmin()) {
+        if (!$this->podeVerPedido($pedido, $codigo)) {
             Session::set('intended', '/conta/pedidos/' . $codigo);
             Session::setFlash('error', 'Entre na sua conta para ver este pedido.');
             redirect('/entrar');
@@ -297,28 +334,50 @@ final class CheckoutController extends Controller
             'pixChave' => Pix::chave(),
             'pixQrBase64' => (string) ($pedido['pix_qr_base64'] ?? ''),
             'mpPublicKey' => MercadoPago::chavePublica(),
+            'cursoUrl' => (\App\Models\Curso::clienteTemAcesso((int) ($pedido['usuario_id'] ?? 0))
+                || (in_array((string) ($pedido['status'] ?? ''), ['pago', 'enviado', 'entregue'], true) && pedido_tem_formacao($pedido)))
+                ? \App\Models\Curso::urlAcesso()
+                : '',
         ]);
     }
 
     public function status(Request $request, array $params = []): never
     {
+        header('Cache-Control: no-store');
         $codigo = (string) ($params['codigo'] ?? '');
         $pedido = Pedido::firstWhere('codigo', $codigo);
-        if (!$pedido) {
-            header('Cache-Control: no-store');
+        if (!$pedido || !$this->podeVerPedido($pedido, $codigo)) {
             Response::json(['ok' => false], 404);
         }
 
+        if (RateLimiter::tooMany('pedido_status')) {
+            $status = (string) ($pedido['status'] ?? 'pendente');
+            Response::json([
+                'ok' => true,
+                'status' => $status,
+                'pago' => in_array($status, ['pago', 'enviado', 'entregue'], true),
+            ]);
+        }
+
+        RateLimiter::hit('pedido_status');
         MercadoPago::sincronizarPedidoPendente($pedido);
         $pedido = Pedido::firstWhere('codigo', $codigo) ?? $pedido;
 
         $status = (string) ($pedido['status'] ?? 'pendente');
-        header('Cache-Control: no-store');
         Response::json([
             'ok' => true,
             'status' => $status,
             'pago' => in_array($status, ['pago', 'enviado', 'entregue'], true),
         ]);
+    }
+
+    /** @param array<string, mixed> $pedido */
+    private function podeVerPedido(array $pedido, string $codigo): bool
+    {
+        $dono = Auth::id() && (int) ($pedido['usuario_id'] ?? 0) === Auth::id();
+        $recem = Session::get('ultimo_pedido') === $codigo;
+
+        return $dono || $recem || Auth::isAdmin();
     }
 
     /**

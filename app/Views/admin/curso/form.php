@@ -11,6 +11,10 @@
         </select>
     </label>
     <label><span>Descrição</span><textarea name="descricao"><?= e($curso['descricao'] ?? '') ?></textarea></label>
+    <label><span>Link das aulas (https)</span>
+        <input type="url" name="acesso_url" value="<?= e((string) ($curso['acesso_url'] ?? '')) ?>" placeholder="https://…" inputmode="url">
+    </label>
+    <p class="field-hint">Depois do pagamento, a aluna recebe este link por e-mail e o botão aparece na conta. Memberkit, YouTube privado ou Drive.</p>
     <h2>Módulos</h2>
     <?php foreach ($modulos ?? [] as $m): ?>
         <input type="hidden" name="modulo_id[]" value="<?= (int) $m['id'] ?>">

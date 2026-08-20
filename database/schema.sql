@@ -11,6 +11,7 @@ CREATE DATABASE IF NOT EXISTS `elomiah`
 USE `elomiah`;
 
 DROP TABLE IF EXISTS `rate_limits`;
+DROP TABLE IF EXISTS `recuperacao_senhas`;
 DROP TABLE IF EXISTS `visitantes`;
 DROP TABLE IF EXISTS `solicitacoes_lgpd`;
 DROP TABLE IF EXISTS `consentimentos_lgpd`;
@@ -212,6 +213,7 @@ CREATE TABLE `cursos` (
   `descricao` TEXT,
   `preco` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   `imagem` VARCHAR(255) DEFAULT NULL,
+  `acesso_url` VARCHAR(500) DEFAULT NULL,
   `status` ENUM('ativo','inativo') NOT NULL DEFAULT 'ativo',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -29,12 +29,26 @@ final class Application
 
         try {
             (new GuestTracking())->handle($request);
+            $this->expirarPedidosPendentes();
             $router = new Router();
             $register = require CONFIG_PATH . DIRECTORY_SEPARATOR . 'routes.php';
             $register($router);
             $router->dispatch($request);
         } catch (Throwable $e) {
             $this->handleException($e);
+        }
+    }
+
+    private function expirarPedidosPendentes(): void
+    {
+        $lock = STORAGE_PATH . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . '.expire-pedidos';
+        if (is_file($lock) && filemtime($lock) > time() - 600) {
+            return;
+        }
+        @touch($lock);
+        try {
+            \App\Models\Pedido::expirarPendentes(24);
+        } catch (Throwable) {
         }
     }
 

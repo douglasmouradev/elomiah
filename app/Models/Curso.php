@@ -11,6 +11,59 @@ final class Curso extends Model
 {
     protected static string $table = 'cursos';
 
+    public static function garantirColunas(): void
+    {
+        static $feito = false;
+        if ($feito) {
+            return;
+        }
+        $cols = Database::fetchAll('SHOW COLUMNS FROM cursos');
+        $nomes = array_column($cols, 'Field');
+        if (!in_array('acesso_url', $nomes, true)) {
+            Database::connection()->exec(
+                'ALTER TABLE cursos ADD COLUMN `acesso_url` VARCHAR(500) DEFAULT NULL AFTER `imagem`'
+            );
+        }
+        $feito = true;
+    }
+
+    public static function ativo(): ?array
+    {
+        self::garantirColunas();
+        return self::firstWhere('status', 'ativo') ?? (self::all()[0] ?? null);
+    }
+
+    public static function urlAcesso(?array $curso = null): string
+    {
+        self::garantirColunas();
+        $curso ??= self::ativo();
+        $url = trim((string) ($curso['acesso_url'] ?? ''));
+        if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
+            return $url;
+        }
+
+        return '';
+    }
+
+    public static function clienteTemAcesso(int $usuarioId): bool
+    {
+        if ($usuarioId < 1) {
+            return false;
+        }
+        $pedidos = Pedido::doCliente($usuarioId);
+        foreach ($pedidos as $pedido) {
+            $status = (string) ($pedido['status'] ?? '');
+            if (!in_array($status, ['pago', 'enviado', 'entregue'], true)) {
+                continue;
+            }
+            if (pedido_tem_formacao($pedido)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** Garante um produto comprável com o mesmo slug e preço do curso. */
     public static function garantirProduto(?array $curso): ?array
     {

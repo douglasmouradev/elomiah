@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\Configuracao;
+
 /**
  * Payload Pix (EMV / copia e cola) para a chave da Elomiah.
  */
@@ -11,7 +13,7 @@ final class Pix
 {
     public static function chave(): string
     {
-        return trim((string) (config('app')['pix_chave'] ?? ''));
+        return Configuracao::pix()['chave'];
     }
 
     public static function configurado(): bool
@@ -22,8 +24,9 @@ final class Pix
     public static function copiaECola(string $txid, float $valor): string
     {
         $chave = self::chave();
-        $nome = self::ascii((string) (config('app')['pix_nome'] ?? 'ELOMIAH'), 25);
-        $cidade = self::ascii((string) (config('app')['pix_cidade'] ?? 'SAO PAULO'), 15);
+        $pix = Configuracao::pix();
+        $nome = self::ascii($pix['nome'], 25);
+        $cidade = self::ascii($pix['cidade'], 15);
         $txid = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $txid) ?: 'ELOMIAH', 0, 25));
         $valorStr = number_format(max(0, $valor), 2, '.', '');
 

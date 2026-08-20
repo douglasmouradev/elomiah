@@ -69,6 +69,11 @@ final class AuthController extends Controller
 
     public function register(Request $request, array $params = []): never
     {
+        if (RateLimiter::tooMany('cadastro')) {
+            Session::setFlash('error', 'Muitos cadastros em pouco tempo. Aguarde um pouco.');
+            redirect('/cadastro');
+        }
+
         $data = Validator::sanitize($request->all());
         $errors = Validator::make($data, [
             'nome' => 'required|min:3|max:120',
@@ -91,6 +96,8 @@ final class AuthController extends Controller
             Session::setFlash('error', implode(' ', $errors));
             redirect('/cadastro');
         }
+
+        RateLimiter::hit('cadastro');
 
         $id = Usuario::create([
             'nome' => $data['nome'],

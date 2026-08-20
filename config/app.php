@@ -21,6 +21,10 @@ return [
     'banco_codigo' => (string) env('BANCO_CODIGO', '0260'),
     'banco_agencia' => (string) env('BANCO_AGENCIA', '0001'),
     'banco_conta' => (string) env('BANCO_CONTA', ''),
+    'loja_razao' => (string) env('LOJA_RAZAO', 'Elomiah'),
+    'loja_cnpj' => (string) env('LOJA_CNPJ', ''),
+    'loja_ie' => (string) env('LOJA_IE', ''),
+    'loja_endereco' => (string) env('LOJA_ENDERECO', ''),
     'session_secure' => env('SESSION_SECURE', '0') === '1',
     'upload_max_mb' => 4,
     'rate_limit' => [
@@ -30,5 +34,8 @@ return [
         'lgpd' => ['max' => 3, 'window' => 3600],
         'depoimento' => ['max' => 3, 'window' => 3600],
         'recuperar' => ['max' => 3, 'window' => 3600],
+        'cadastro' => ['max' => 5, 'window' => 3600],
+        'pagar_cartao' => ['max' => 8, 'window' => 600],
+        'pedido_status' => ['max' => 80, 'window' => 180],
     ],
 ];

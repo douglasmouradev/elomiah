@@ -33,5 +33,7 @@ $dado = $p['volume'] ?? $p['colecao'] ?? $p['categoria_nome'] ?? '';
             <input type="hidden" name="produto_id" value="<?= (int) $p['id'] ?>">
             <button type="submit">À sacola</button>
         </form>
+    <?php elseif (($p['compra_tipo'] ?? 'carrinho') === 'carrinho' && !produto_digital($p)): ?>
+        <p class="card-add card-sold">Esgotado</p>
     <?php endif; ?>
 </article>

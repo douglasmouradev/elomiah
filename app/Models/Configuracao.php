@@ -60,4 +60,65 @@ final class Configuracao extends Model
 
         return $cache;
     }
+
+    public static function setFrete(float $valor, string $nome, string $prazo): void
+    {
+        $valor = max(0, round($valor, 2));
+        $nome = mb_substr(trim($nome) !== '' ? trim($nome) : 'Despacho do ateliê', 0, 80);
+        $prazo = mb_substr(trim($prazo) !== '' ? trim($prazo) : 'Sai em até 3 dias úteis · Correios, 5 a 12 dias no destino', 0, 180);
+        self::set('frete_padrao', number_format($valor, 2, '.', ''));
+        self::set('frete_nome', $nome);
+        self::set('frete_prazo', $prazo);
+    }
+
+    public static function pix(): array
+    {
+        $cfg = config('app');
+        $chave = trim((string) self::get('pix_chave', ''));
+        $nome = trim((string) self::get('pix_nome', ''));
+        $cidade = trim((string) self::get('pix_cidade', ''));
+
+        return [
+            'chave' => $chave !== '' ? $chave : trim((string) ($cfg['pix_chave'] ?? '')),
+            'nome' => $nome !== '' ? $nome : trim((string) ($cfg['pix_nome'] ?? 'ELOMIAH')),
+            'cidade' => $cidade !== '' ? $cidade : trim((string) ($cfg['pix_cidade'] ?? 'SAO PAULO')),
+        ];
+    }
+
+    public static function setPix(string $chave, string $nome, string $cidade): void
+    {
+        $chave = trim($chave);
+        $nome = mb_substr(trim($nome) !== '' ? trim($nome) : 'ELOMIAH', 0, 25);
+        $cidade = mb_substr(trim($cidade) !== '' ? trim($cidade) : 'SAO PAULO', 0, 15);
+        if ($chave !== '') {
+            self::set('pix_chave', $chave);
+        }
+        self::set('pix_nome', $nome);
+        self::set('pix_cidade', $cidade);
+    }
+
+    /** @return array{razao: string, cnpj: string, ie: string, endereco: string} */
+    public static function loja(): array
+    {
+        $cfg = config('app');
+        $razao = trim((string) self::get('loja_razao', ''));
+        $cnpj = trim((string) self::get('loja_cnpj', ''));
+        $ie = trim((string) self::get('loja_ie', ''));
+        $endereco = trim((string) self::get('loja_endereco', ''));
+
+        return [
+            'razao' => $razao !== '' ? $razao : trim((string) ($cfg['loja_razao'] ?? 'Elomiah')),
+            'cnpj' => $cnpj !== '' ? $cnpj : trim((string) ($cfg['loja_cnpj'] ?? '')),
+            'ie' => $ie !== '' ? $ie : trim((string) ($cfg['loja_ie'] ?? '')),
+            'endereco' => $endereco !== '' ? $endereco : trim((string) ($cfg['loja_endereco'] ?? '')),
+        ];
+    }
+
+    public static function setLoja(string $razao, string $cnpj, string $ie, string $endereco): void
+    {
+        self::set('loja_razao', mb_substr(trim($razao) !== '' ? trim($razao) : 'Elomiah', 0, 120));
+        self::set('loja_cnpj', mb_substr(trim($cnpj), 0, 32));
+        self::set('loja_ie', mb_substr(trim($ie), 0, 32));
+        self::set('loja_endereco', mb_substr(trim($endereco), 0, 180));
+    }
 }

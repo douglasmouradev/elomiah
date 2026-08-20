@@ -109,7 +109,7 @@ final class Database
             'usuarios', 'categorias', 'produtos', 'imagens_produto', 'pedidos', 'itens_pedido',
             'depoimentos', 'enderecos', 'cursos', 'modulos_curso', 'faqs_curso', 'logs_admin',
             'consentimentos_lgpd', 'solicitacoes_lgpd', 'visitantes', 'configuracoes',
-            'mensagens_contato', 'rate_limits', 'notificacoes',
+            'mensagens_contato', 'rate_limits', 'notificacoes', 'recuperacao_senhas',
         ];
         if (!in_array($table, $allowed, true)) {
             throw new RuntimeException('Tabela não permitida.');

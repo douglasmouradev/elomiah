@@ -15,6 +15,8 @@
 <?php
 $avisosNaoLidos = \App\Models\Notificacao::naoLidas();
 $avisos = \App\Models\Notificacao::recentes(8);
+$contatosNovos = \App\Models\MensagemContato::count('lido = 0');
+$lgpdPendentes = \App\Models\SolicitacaoLgpd::count('status = :s', ['s' => 'pendente']);
 ?>
 <aside class="admin-side">
     <a class="admin-brand" href="<?= e(url('/admin')) ?>">ELOMIAH</a>
@@ -29,6 +31,18 @@ $avisos = \App\Models\Notificacao::recentes(8);
         </a>
         <a class="<?= is_active('/admin/depoimentos') ? 'is-on' : '' ?>" href="<?= e(url('/admin/depoimentos')) ?>">Depoimentos</a>
         <a class="<?= is_active('/admin/curso') ? 'is-on' : '' ?>" href="<?= e(url('/admin/curso')) ?>">Curso</a>
+        <a class="<?= is_active('/admin/contato') ? 'is-on' : '' ?>" href="<?= e(url('/admin/contato')) ?>">
+            Contato
+            <?php if ($contatosNovos > 0): ?>
+                <span class="nav-badge"><?= (int) $contatosNovos ?></span>
+            <?php endif; ?>
+        </a>
+        <a class="<?= is_active('/admin/lgpd') ? 'is-on' : '' ?>" href="<?= e(url('/admin/lgpd')) ?>">
+            Dados
+            <?php if ($lgpdPendentes > 0): ?>
+                <span class="nav-badge"><?= (int) $lgpdPendentes ?></span>
+            <?php endif; ?>
+        </a>
         <a class="<?= is_active('/admin/pagamento') ? 'is-on' : '' ?>" href="<?= e(url('/admin/pagamento')) ?>">Pagamento</a>
         <a class="<?= is_active('/admin/conta') ? 'is-on' : '' ?>" href="<?= e(url('/admin/conta')) ?>">Senha</a>
         <a class="<?= is_active('/admin/logs') ? 'is-on' : '' ?>" href="<?= e(url('/admin/logs')) ?>">Auditoria</a>

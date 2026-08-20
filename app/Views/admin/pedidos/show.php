@@ -1,15 +1,16 @@
 <?php
 $pedido = $pedido ?? [];
 $status = (string) ($pedido['status'] ?? 'pendente');
-$acao = pedido_status_acao($status);
-$passos = ['pendente', 'pago', 'enviado', 'entregue'];
+$digital = pedido_so_digital($pedido);
+$acao = pedido_status_acao($status, $digital);
+$passos = $digital ? ['pendente', 'pago'] : ['pendente', 'pago', 'enviado', 'entregue'];
 $idx = array_search($status, $passos, true);
 $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($pedido['codigo'] ?? '') . ' da Elomiah foi enviado'
     . (!empty($pedido['codigo_rastreio']) ? '. Rastreio: ' . $pedido['codigo_rastreio'] : '')
     . '.';
 ?>
-<p class="pedido-kicker">
-    <span class="status-pill status-<?= e($status) ?>"><?= e(pedido_status_rotulo($status)) ?></span>
+    <p class="pedido-kicker">
+    <span class="status-pill status-<?= e($status) ?>"><?= e(pedido_status_rotulo($status, $digital)) ?></span>
     <?= e($pedido['codigo']) ?> · <?= e($pedido['created_at']) ?>
 </p>
 
@@ -25,7 +26,7 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
             $classe = 'is-on';
         }
         ?>
-        <li class="<?= $classe ?>"><?= e(pedido_status_rotulo($passo)) ?></li>
+        <li class="<?= $classe ?>"><?= e(pedido_status_rotulo($passo, $digital)) ?></li>
     <?php endforeach; ?>
 </ol>
 
@@ -50,9 +51,11 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
     <?php endforeach; ?>
     </tbody>
 </table>
-<?php $freteInfo = frete(); ?>
+<?php $freteInfo = $digital ? ['nome' => 'Acesso digital', 'prazo' => 'Sem despacho'] : frete(); ?>
 <p>Subtotal <?= e(money($pedido['subtotal'])) ?> · <?= e($freteInfo['nome']) ?> <?= e(money($pedido['frete'])) ?> · <strong>Total <?= e(money($pedido['total'])) ?></strong></p>
+<?php if (!$digital): ?>
 <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
+<?php endif; ?>
 <p>
     Pagamento: <?= e(pagamento_rotulo($pedido['metodo_pagamento'] ?? '')) ?>
     <?php if (($pedido['metodo_pagamento'] ?? '') === 'cartao'): ?>
@@ -70,7 +73,11 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
 <?php elseif ($status === 'pendente'): ?>
     <p class="field-hint">O Mercado Pago confirma sozinho quando o banco autorizar. Use <strong>Marcar como pago</strong> só se o valor já entrou e o site ainda não atualizou.</p>
 <?php endif; ?>
-<?php if (!empty($pedido['codigo_rastreio']) || !empty($pedido['transportadora'])): ?>
+<?php if ($digital && in_array($status, ['pago', 'enviado', 'entregue'], true)): ?>
+    <?php $urlAulas = \App\Models\Curso::urlAcesso(); ?>
+    <p class="field-hint">Formação digital. <?= $urlAulas !== '' ? 'O acesso já está no e-mail e na conta da aluna.' : 'Coloque o link das aulas em Curso para a aluna abrir as aulas.' ?></p>
+<?php endif; ?>
+<?php if (!$digital && (!empty($pedido['codigo_rastreio']) || !empty($pedido['transportadora']))): ?>
     <p>Envio: <?= e($pedido['transportadora'] ?: 'Correios') ?><?php if (!empty($pedido['codigo_rastreio'])): ?> · rastreio <?= e($pedido['codigo_rastreio']) ?><?php endif; ?></p>
 <?php endif; ?>
 
@@ -96,17 +103,19 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
         <?= csrf_field() ?>
         <label><span>Ou escolher outro status</span>
             <select name="status">
-                <?php foreach (['pendente','pago','enviado','entregue','cancelado'] as $s): ?>
-                    <option value="<?= $s ?>" <?= $status === $s ? 'selected' : '' ?>><?= e(pedido_status_rotulo($s)) ?></option>
+                <?php foreach (($digital ? ['pendente','pago','cancelado'] : ['pendente','pago','enviado','entregue','cancelado']) as $s): ?>
+                    <option value="<?= $s ?>" <?= $status === $s ? 'selected' : '' ?>><?= e(pedido_status_rotulo($s, $digital)) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>
+        <?php if (!$digital): ?>
         <label><span>Transportadora</span>
             <input type="text" name="transportadora" value="<?= e((string) ($pedido['transportadora'] ?? '')) ?>">
         </label>
         <label><span>Código de rastreio</span>
             <input type="text" name="codigo_rastreio" value="<?= e((string) ($pedido['codigo_rastreio'] ?? '')) ?>">
         </label>
+        <?php endif; ?>
         <button class="btn btn-ghost" type="submit">Guardar status</button>
     </form>
 
@@ -120,6 +129,7 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
 
     <?php if (in_array($status, ['pago', 'enviado', 'entregue'], true)): ?>
         <p>
+            <a class="btn btn-ghost" href="<?= e(url('/pedido/' . ($pedido['codigo'] ?? '') . '/nota')) ?>">Ver o recibo</a>
             <a class="btn btn-ghost" href="<?= e(pedido_whatsapp_cliente($pedido['telefone_cliente'] ?? '', $status === 'enviado' ? $msgEnvio : 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Sobre o pedido ' . ($pedido['codigo'] ?? '') . ' da Elomiah.')) ?>" target="_blank" rel="noopener">
                 Avisar no WhatsApp
             </a>

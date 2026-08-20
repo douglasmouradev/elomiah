@@ -1,5 +1,6 @@
 .env
 /storage/logs/*.log
+/storage/logs/.expire-pedidos
 /public/assets/uploads/produtos/*
 /public/assets/uploads/depoimentos/*
 !/public/assets/uploads/produtos/.gitkeep

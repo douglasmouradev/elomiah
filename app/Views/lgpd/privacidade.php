@@ -23,7 +23,7 @@
     <h2>Direitos</h2>
     <p>Acesso, correção, portabilidade, eliminação, informação sobre compartilhamentos e revogação de consentimento. Exercício em <a href="<?= e(url('/meus-dados')) ?>">Seus dados</a>.</p>
     <h2>Cookies</h2>
-    <p>Essenciais: sessão, CSRF, sacola. Não essenciais: métricas de visita. Você pode aceitar, limitar-se aos essenciais ou recusar os não essenciais no banner.</p>
+    <p>Essenciais: sessão, CSRF, sacola. Não essenciais: métricas de visita, gravadas só se você tocar em Aceitar. “Só o essencial” e “Recusar” não geram esse rastreio.</p>
     <h2>Segurança</h2>
     <p>Senhas com hash (Argon2id/bcrypt). Sessões httponly, SameSite=Strict e Secure em produção. Prepared statements PDO. HTTPS obrigatório em produção.</p>
 </section>

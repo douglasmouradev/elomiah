@@ -26,6 +26,10 @@ final class CursoController extends Controller
 
         $this->view('curso/index', [
             'title' => ($curso['titulo'] ?? 'Curso') . ' — Elomiah',
+            'metaDescription' => (string) ($curso['descricao'] ?? 'Formação com a Geo. O Ritual das Essências.'),
+            'ogTitle' => ($curso['titulo'] ?? 'O Ritual das Essências') . ' — Elomiah',
+            'ogDescription' => (string) ($curso['descricao'] ?? 'Formação com a Geo: olfato, casa e o hábito de consagrar o espaço.'),
+            'ogImage' => asset((string) ($curso['imagem'] ?? 'images/still-sagrado.webp')),
             'curso' => $curso,
             'modulos' => $modulos,
             'faqs' => $faqs,

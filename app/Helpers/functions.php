@@ -87,6 +87,14 @@ function flash(string $key, mixed $default = null): mixed
     return Session::flash($key, $default);
 }
 
+/** essenciais | todos | recusar | vazio se ainda não escolheu */
+function cookie_consentimento(): string
+{
+    $escolha = (string) ($_COOKIE['elomiah_cookies'] ?? '');
+
+    return in_array($escolha, ['essenciais', 'todos', 'recusar'], true) ? $escolha : '';
+}
+
 function money(float|int|string|null $value): string
 {
     return 'R$ ' . number_format((float) $value, 2, ',', '.');
@@ -146,7 +154,7 @@ function frete_do_carrinho(array $carrinho): array
     return [
         'valor' => 0.0,
         'nome' => 'Acesso digital',
-        'prazo' => 'Sem despacho · o acesso chega por e-mail após o pagamento',
+        'prazo' => 'Sem despacho · o acesso libera nesta conta depois do pagamento',
     ];
 }
 
@@ -215,8 +223,51 @@ function pagamento_rotulo(?string $metodo): string
     };
 }
 
-function pedido_status_rotulo(?string $status): string
+function pedido_tem_formacao(array $pedido): bool
 {
+    foreach ($pedido['itens'] ?? [] as $item) {
+        if (produto_digital($item) || produto_digital(['sku' => $item['sku'] ?? '', 'slug' => $item['slug'] ?? ''])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function pedido_so_digital(array $pedido): bool
+{
+    $itens = $pedido['itens'] ?? [];
+    if ($itens === []) {
+        return empty($pedido['endereco']) && (float) ($pedido['frete'] ?? 0) < 0.01;
+    }
+    foreach ($itens as $item) {
+        $produto = $item;
+        if (!produto_digital($produto)) {
+            $produto = [
+                'sku' => (string) ($item['sku'] ?? ''),
+                'slug' => (string) ($item['slug'] ?? ''),
+                'categoria_slug' => (string) ($item['categoria_slug'] ?? ''),
+            ];
+        }
+        if (!produto_digital($produto)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function pedido_status_rotulo(?string $status, bool $digital = false): string
+{
+    if ($digital) {
+        return match ($status) {
+            'pendente' => 'Aguardando pagamento',
+            'pago', 'enviado', 'entregue' => 'Acesso liberado',
+            'cancelado' => 'Cancelado',
+            default => (string) $status,
+        };
+    }
+
     return match ($status) {
         'pendente' => 'Aguardando pagamento',
         'pago' => 'Pago',
@@ -227,8 +278,15 @@ function pedido_status_rotulo(?string $status): string
     };
 }
 
-function pedido_status_acao(?string $status): ?array
+function pedido_status_acao(?string $status, bool $digital = false): ?array
 {
+    if ($digital) {
+        return match ($status) {
+            'pendente' => ['status' => 'pago', 'rotulo' => 'Marcar como pago'],
+            default => null,
+        };
+    }
+
     return match ($status) {
         'pendente' => ['status' => 'pago', 'rotulo' => 'Marcar como pago'],
         'pago' => ['status' => 'enviado', 'rotulo' => 'Marcar como enviado'],

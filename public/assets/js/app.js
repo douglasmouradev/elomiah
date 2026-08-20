@@ -13,9 +13,6 @@
   toggle?.addEventListener('click', () => nav?.classList.toggle('is-open'));
 
   const banner = document.querySelector('.cookie-banner');
-  if (banner && !document.cookie.includes('elomiah_cookies=')) {
-    banner.classList.add('is-on');
-  }
   banner?.querySelectorAll('[data-cookie]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const escolha = btn.getAttribute('data-cookie');

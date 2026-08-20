@@ -61,7 +61,10 @@ $carrinho = $carrinho ?? ['items' => [], 'total' => 0];
                 <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
                 <p class="price price-lg">Estimativa <?= e(money($estimado)) ?></p>
             </div>
-            <a class="btn btn-gold" href="<?= e(url('/checkout')) ?>">Seguir para o checkout</a>
+            <?php if (!\App\Core\Auth::check()): ?>
+                <p class="field-hint">O checkout pede conta. A sacola permanece se você entrar ou se cadastrar agora.</p>
+            <?php endif; ?>
+            <a class="btn btn-gold" href="<?= e(url('/checkout')) ?>"><?= \App\Core\Auth::check() ? 'Seguir para o checkout' : 'Entrar e concluir' ?></a>
         </div>
     <?php endif; ?>
 </section>

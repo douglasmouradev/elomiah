@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\Curso;
 use App\Models\Pedido;
 
 final class PedidoMail
@@ -45,22 +46,14 @@ final class PedidoMail
             return;
         }
 
-        $html = self::layout(
-            'Pagamento confirmado',
-            self::intro(
-                self::soDigital($pedido)
-                    ? 'O pagamento do pedido ' . self::codigo($pedido) . ' entrou. O acesso à formação chega por e-mail.'
-                    : 'O pagamento do pedido ' . self::codigo($pedido) . ' entrou. O ritual segue para o despacho.'
-            )
-            . self::itens($pedido)
-            . self::totais($pedido)
-            . self::cta('Ver o pedido', url('/conta/pedidos/' . $pedido['codigo']))
-        );
+        $digital = pedido_tem_formacao($pedido) || self::soDigital($pedido);
+        $urlAulas = $digital ? Curso::urlAcesso() : '';
+        $ctaPago = $urlAulas !== '' ? self::cta('Abrir as aulas', $urlAulas) : '';
 
         Mail::send(
             (string) ($pedido['email_cliente'] ?? ''),
-            'Pagamento confirmado · ' . self::codigo($pedido),
-            $html
+            'Recibo de compra · ' . self::codigo($pedido),
+            NotaCompra::html($pedido, false, $ctaPago)
         );
     }
 
@@ -147,7 +140,7 @@ final class PedidoMail
     private static function envio(array $pedido): string
     {
         if (self::soDigital($pedido)) {
-            return '<p style="margin:0 0 22px;font-size:13px;color:#5C6B61">Formação digital · o acesso chega por e-mail após o pagamento.</p>';
+            return '<p style="margin:0 0 22px;font-size:13px;color:#5C6B61">Formação digital · o acesso libera nesta conta depois do pagamento.</p>';
         }
 
         $frete = frete();
@@ -169,7 +162,7 @@ final class PedidoMail
     /** @param array<string, mixed> $pedido */
     private static function soDigital(array $pedido): bool
     {
-        return empty($pedido['endereco']) && (float) ($pedido['frete'] ?? 0) < 0.01;
+        return pedido_so_digital($pedido);
     }
 
     private static function cta(string $rotulo, string $href): string

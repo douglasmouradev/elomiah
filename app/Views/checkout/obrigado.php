@@ -14,17 +14,25 @@ $pixQrBase64 = (string) ($pixQrBase64 ?? '');
 $pixAutomatico = !empty($pedido['mp_payment_id']);
 $mpPublicKey = (string) ($mpPublicKey ?? '');
 $cartaoNoSite = $pendente && $ehCartao && $mpPublicKey !== '';
+$digital = pedido_so_digital($pedido);
+$cursoUrl = (string) ($cursoUrl ?? '');
+$pagoComAcesso = $pago && $digital;
 ?>
 <section class="page-hero container">
-    <p class="eyebrow"><?= e(pedido_status_rotulo($status)) ?></p>
+    <p class="eyebrow"><?= e(pedido_status_rotulo($status, $digital)) ?></p>
     <h1><?= e($pedido['codigo'] ?? '') ?></h1>
 
     <?php if ($status !== 'cancelado'): ?>
         <ol class="order-track">
             <?php
-            $passos = ['pendente' => 'Pedido', 'pago' => 'Pago', 'enviado' => 'Enviado', 'entregue' => 'Entregue'];
+            $passos = $digital
+                ? ['pendente' => 'Pedido', 'pago' => 'Acesso']
+                : ['pendente' => 'Pedido', 'pago' => 'Pago', 'enviado' => 'Enviado', 'entregue' => 'Entregue'];
             $ordem = array_keys($passos);
-            $idx = array_search($status, $ordem, true);
+            $idx = array_search($status === 'enviado' || $status === 'entregue' ? 'pago' : $status, $ordem, true);
+            if ($digital && in_array($status, ['enviado', 'entregue'], true)) {
+                $idx = array_search('pago', $ordem, true);
+            }
             foreach ($passos as $chave => $rotulo):
                 $i = array_search($chave, $ordem, true);
                 $classe = ($idx !== false && $i < $idx) ? 'is-done' : (($idx !== false && $i === $idx) ? 'is-on' : '');
@@ -34,15 +42,23 @@ $cartaoNoSite = $pendente && $ehCartao && $mpPublicKey !== '';
         </ol>
     <?php endif; ?>
 
-    <?php if ($pago && $ehCartao): ?>
+    <?php if ($pagoComAcesso): ?>
+        <p class="lede" style="margin-inline:auto">Pagamento confirmado. A formação está nesta conta. O recibo foi para o seu e-mail.</p>
+        <p>
+            <?php if ($cursoUrl !== ''): ?>
+                <a class="btn btn-gold" href="<?= e($cursoUrl) ?>" target="_blank" rel="noopener">Abrir as aulas</a>
+            <?php endif; ?>
+            <a class="btn btn-ghost" href="<?= e(url('/conta/curso')) ?>">Ver na conta</a>
+        </p>
+    <?php elseif ($pago && $ehCartao): ?>
         <p class="lede" style="margin-inline:auto">
             Cartão <?= e(\App\Support\CartaoCredito::bandeiraRotulo((string) ($pedido['cartao_bandeira'] ?? ''))) ?>
             <?php if (!empty($pedido['cartao_final'])): ?>final <?= e($pedido['cartao_final']) ?><?php endif; ?>
             <?php if (!empty($pedido['parcelas'])): ?> · <?= (int) $pedido['parcelas'] ?>x<?php endif; ?>.
-            Confirmação enviada para <?= e($pedido['email_cliente'] ?? '') ?>.
+            Confirmação e o recibo de compra foram para <?= e($pedido['email_cliente'] ?? '') ?>.
         </p>
     <?php elseif ($pago): ?>
-        <p class="lede" style="margin-inline:auto">Pix confirmado. O ritual segue para despacho.</p>
+        <p class="lede" style="margin-inline:auto">Pix confirmado. O recibo de compra foi para o seu e-mail. O ritual segue para despacho.</p>
     <?php elseif ($status === 'enviado'): ?>
         <p class="lede" style="margin-inline:auto">
             Seu pedido saiu do ateliê<?= !empty($pedido['transportadora']) ? ' pelos ' . e($pedido['transportadora']) : '' ?>.
@@ -53,7 +69,7 @@ $cartaoNoSite = $pendente && $ehCartao && $mpPublicKey !== '';
     <?php elseif ($status === 'entregue'): ?>
         <p class="lede" style="margin-inline:auto">Pedido entregue. Que o cômodo receba bem o cheiro.</p>
     <?php elseif ($pendente && $ehPix && $pixPayload !== ''): ?>
-        <p class="lede" style="margin-inline:auto">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confirma quando o valor entrar — esta página acompanha.' ?></p>
+        <p class="lede" style="margin-inline:auto">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confere na Nubank e marca como pago. Você recebe um e-mail — esta página não confirma sozinha pelo banco.' ?></p>
         <div class="pix-box">
             <?php if ($pixQrBase64 !== ''): ?>
                 <img class="pix-qr" src="data:image/png;base64,<?= e($pixQrBase64) ?>" alt="QR Code Pix" width="220" height="220">
@@ -71,8 +87,8 @@ $cartaoNoSite = $pendente && $ehCartao && $mpPublicKey !== '';
                 <button class="btn btn-gold" type="button" data-copy="pix-cola">Copiar Pix</button>
             </div>
             <textarea id="pix-cola" class="visually-hidden" readonly><?= e($pixPayload) ?></textarea>
-            <p class="pay-safe"><?= $pixAutomatico ? 'Abra o app do banco, leia o QR ou cole o Pix. Não feche esta aba: ela detecta o pagamento e confirma.' : 'Abra o app do banco, leia o QR ou cole o Pix. Quando o ateliê confirmar o recebimento, esta página atualiza.' ?></p>
-            <p class="pix-wait" id="pix-wait">Aguardando o Pix…</p>
+            <p class="pay-safe"><?= $pixAutomatico ? 'Abra o app do banco, leia o QR ou cole o Pix. Não feche esta aba: ela detecta o pagamento e confirma.' : 'Abra o app do banco, leia o QR ou cole o Pix. Quando a Geo marcar o recebimento no ateliê, esta página atualiza e o e-mail parte.' ?></p>
+            <p class="pix-wait" id="pix-wait"><?= $pixAutomatico ? 'Aguardando o Pix…' : 'Aguardando o ateliê confirmar o Pix…' ?></p>
         </div>
     <?php elseif ($pendente && $ehCartao && $cartaoNoSite): ?>
         <p class="lede" style="margin-inline:auto">Pague <?= e(money($pedido['total'] ?? 0)) ?> no cartão. O número não fica no ateliê.</p>

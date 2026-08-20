@@ -10,7 +10,7 @@ $freteInfo = $freteInfo ?? frete();
 <section class="page-hero container">
     <p class="eyebrow">Fechamento</p>
     <h1>Checkout</h1>
-    <p class="lede lede-center"><?= $requerEnvio ? 'A compra fica nesta conta. Depois você acompanha o envio e o rastreio em Pedidos.' : 'A matrícula fica nesta conta. O acesso chega por e-mail depois do pagamento.' ?></p>
+    <p class="lede lede-center"><?= $requerEnvio ? 'A compra fica nesta conta. Depois você acompanha o envio e o rastreio em Pedidos.' : 'A matrícula fica nesta conta. O acesso libera aqui depois do pagamento.' ?></p>
 </section>
 <section class="container checkout-layout">
     <form class="form" method="post" action="<?= e(url('/checkout')) ?>" data-checkout>
@@ -46,7 +46,7 @@ $freteInfo = $freteInfo ?? frete();
                 <label><span>Estado</span><input type="text" name="estado" id="estado" maxlength="2" value="<?= e((string) old('estado', $endereco['estado'] ?? '')) ?>" required></label>
             </div>
             <?php else: ?>
-            <p class="field-hint">Formação digital: sem despacho. O acesso chega neste e-mail depois do pagamento.</p>
+            <p class="field-hint">Formação digital: sem despacho. O acesso libera nesta conta depois do pagamento.</p>
             <?php endif; ?>
             <label><span>Observações</span><textarea name="observacoes"><?= e((string) old('observacoes')) ?></textarea></label>
             <button class="btn btn-gold" type="button" data-to-pay>Continuar para o pagamento</button>

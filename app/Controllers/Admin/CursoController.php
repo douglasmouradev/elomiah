@@ -18,6 +18,10 @@ final class CursoController extends Controller
     public function edit(Request $request, array $params = []): never
     {
         $curso = Curso::firstWhere('status', 'ativo') ?? Curso::all()[0] ?? null;
+        Curso::garantirColunas();
+        if ($curso) {
+            $curso = Curso::find((int) $curso['id']);
+        }
         $this->view('admin/curso/form', [
             'title' => 'Curso — Ateliê',
             'curso' => $curso,
@@ -29,9 +33,16 @@ final class CursoController extends Controller
     public function update(Request $request, array $params = []): never
     {
         $data = Validator::sanitize($request->all());
+        Curso::garantirColunas();
         $curso = Curso::find((int) ($data['id'] ?? 0));
         if (!$curso) {
             Session::setFlash('error', 'Curso não encontrado.');
+            redirect('/admin/curso');
+        }
+
+        $acesso = trim((string) ($data['acesso_url'] ?? ''));
+        if ($acesso !== '' && self::urlSegura($acesso) === null) {
+            Session::setFlash('error', 'O link das aulas precisa ser um endereço https://.');
             redirect('/admin/curso');
         }
 
@@ -39,6 +50,7 @@ final class CursoController extends Controller
             'titulo' => $data['titulo'] ?? $curso['titulo'],
             'descricao' => $data['descricao'] ?? '',
             'preco' => (float) str_replace(',', '.', (string) ($data['preco'] ?? $curso['preco'])),
+            'acesso_url' => self::urlSegura($acesso),
             'status' => in_array($data['status'] ?? '', ['ativo', 'inativo'], true) ? $data['status'] : 'ativo',
         ]);
         $atualizado = Curso::find((int) $curso['id']);
@@ -69,5 +81,18 @@ final class CursoController extends Controller
         Auth::log('Atualizou curso', 'cursos', (int) $curso['id']);
         Session::setFlash('success', 'Página do curso atualizada.');
         redirect('/admin/curso');
+    }
+
+    private static function urlSegura(string $url): ?string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return null;
+        }
+        if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('#^https://#i', $url)) {
+            return null;
+        }
+
+        return mb_substr($url, 0, 500);
     }
 }

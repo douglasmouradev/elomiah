@@ -11,6 +11,18 @@ $pedidos = $pedidos ?? [];
 <section class="container account-page">
     <p class="account-hello">Olá, <?= e((string) ($usuario['nome'] ?? '')) ?>.</p>
 
+    <?php if (!empty($cursoAcesso)): ?>
+        <article class="account-address">
+            <p class="eyebrow">Formação</p>
+            <p class="lede" style="margin:0 0 1rem">O Ritual das Essências está liberado nesta conta.</p>
+            <?php if (!empty($cursoUrl)): ?>
+                <p><a class="btn btn-gold" href="<?= e((string) $cursoUrl) ?>" target="_blank" rel="noopener">Abrir as aulas</a></p>
+            <?php else: ?>
+                <p class="field-hint">O pagamento entrou. O caminho das aulas aparece aqui quando a Geo publicar o link.</p>
+            <?php endif; ?>
+        </article>
+    <?php endif; ?>
+
     <article class="account-address">
         <p class="eyebrow">Seus dados</p>
         <form class="form" method="post" action="<?= e(url('/conta/perfil')) ?>">
@@ -64,7 +76,8 @@ $pedidos = $pedidos ?? [];
                 <article class="account-order">
                     <header>
                         <p class="eyebrow"><?= e($pedido['codigo']) ?></p>
-                        <span class="status-pill status-<?= e($pedido['status']) ?>"><?= e(pedido_status_rotulo($pedido['status'])) ?></span>
+                        <?php $digitalPedido = pedido_so_digital($pedido); ?>
+                    <span class="status-pill status-<?= e($pedido['status']) ?>"><?= e(pedido_status_rotulo($pedido['status'], $digitalPedido)) ?></span>
                     </header>
                     <ul class="account-items">
                         <?php foreach ($pedido['itens'] ?? [] as $item): ?>
@@ -85,12 +98,21 @@ $pedidos = $pedidos ?? [];
                                 <a href="<?= e($rastreioLink) ?>" target="_blank" rel="noopener">Rastrear envio</a>
                             <?php endif; ?>
                         </p>
+                    <?php elseif (($pedido['status'] ?? '') === 'pago' && $digitalPedido): ?>
+                        <p class="account-track">Pago. A formação está nesta conta.
+                            <a href="<?= e(url('/conta/curso')) ?>">Abrir as aulas</a>
+                        </p>
                     <?php elseif (($pedido['status'] ?? '') === 'pago'): ?>
                         <p class="account-track">Pago. Aguardando o despacho do ateliê.</p>
                     <?php elseif (($pedido['status'] ?? '') === 'pendente'): ?>
                         <p class="account-track">Aguardando o pagamento.</p>
                     <?php endif; ?>
-                    <p><a class="btn btn-ghost" href="<?= e(url('/conta/pedidos/' . $pedido['codigo'])) ?>">Ver pedido</a></p>
+                    <p>
+                        <a class="btn btn-ghost" href="<?= e(url('/conta/pedidos/' . $pedido['codigo'])) ?>">Ver pedido</a>
+                        <?php if (\App\Support\NotaCompra::liberada($pedido)): ?>
+                            <a class="btn btn-ghost" href="<?= e(url('/pedido/' . $pedido['codigo'] . '/nota')) ?>">Ver recibo</a>
+                        <?php endif; ?>
+                    </p>
                 </article>
             <?php endforeach; ?>
         </div>

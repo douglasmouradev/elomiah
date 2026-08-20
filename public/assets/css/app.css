@@ -576,6 +576,14 @@ section { padding: 6.5rem 0; }
   border-bottom: 1px solid var(--linha);
   padding: 0.35rem 0;
 }
+.card-sold {
+  color: var(--cinza);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--linha);
+}
 .price { color: var(--dourado); font-family: var(--serif); letter-spacing: 0.08em; }
 .price-lg { font-size: 1.8rem; margin: 1rem 0; }
 .price-was {
@@ -1209,6 +1217,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--dourado); }
   .course-band .copy { padding: 2.5rem 1.4rem; }
   .footer-bottom { flex-direction: column; }
   .checkout-summary { position: static; }
+  .cart-table thead { display: none; }
+  .cart-table, .cart-table tbody, .cart-table tr, .cart-table td { display: block; width: 100%; }
+  .cart-table tr { padding: 1rem 0; border-bottom: 1px solid var(--linha); }
+  .cart-table td { padding: 0.35rem 0; border: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

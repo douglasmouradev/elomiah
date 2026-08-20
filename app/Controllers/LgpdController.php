@@ -61,6 +61,13 @@ final class LgpdController extends Controller
             'ip' => client_ip(),
         ]);
 
+        \App\Models\Notificacao::criar(
+            'lgpd',
+            'Pedido LGPD · ' . (($data['tipo'] ?? '') === 'excluir' ? 'excluir' : 'exportar'),
+            $data['nome'] . ' · ' . $data['email'],
+            '/admin/lgpd'
+        );
+
         RateLimiter::hit('lgpd');
         Session::setFlash('success', 'Solicitação registrada. O titular dos dados (Geo / Elomiah) responderá em até 15 dias.');
         redirect('/meus-dados');
