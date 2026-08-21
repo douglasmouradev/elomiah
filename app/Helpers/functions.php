@@ -37,7 +37,31 @@ function url(string $path = '/'): string
 {
     $base = rtrim((string) (config('app')['url'] ?? ''), '/');
     $path = '/' . ltrim($path, '/');
-    return $base . ($path === '/' ? '/' : rtrim($path, '/'));
+    $path = $path === '/' ? '/' : rtrim($path, '/');
+
+    // Hosts que engolem a rota (ex.: InfinityFree): index.php?__path=entrar
+    if (
+        env('APP_QUERY_ROUTES', '0') === '1'
+        && $path !== '/'
+        && !str_starts_with($path, '/assets/')
+    ) {
+        return $base . '/index.php?__path=' . rawurlencode(ltrim($path, '/'));
+    }
+
+    return $base . ($path === '/' ? '/' : $path);
+}
+
+/** Prefixo da URL (ex.: /public) quando o site não está na raiz do domínio. */
+function app_base_path(): string
+{
+    static $base = null;
+    if ($base !== null) {
+        return $base;
+    }
+    $path = parse_url((string) (config('app')['url'] ?? ''), PHP_URL_PATH);
+    $base = rtrim((string) ($path ?: ''), '/');
+
+    return $base;
 }
 
 function asset(string $path): string
@@ -48,6 +72,10 @@ function asset(string $path): string
 function current_path(): string
 {
     $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $prefix = app_base_path();
+    if ($prefix !== '' && ($uri === $prefix || str_starts_with($uri, $prefix . '/'))) {
+        $uri = substr($uri, strlen($prefix)) ?: '/';
+    }
     return rtrim($uri, '/') ?: '/';
 }
 

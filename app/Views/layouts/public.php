@@ -4,21 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
+    <meta name="app-base" content="<?= e(rtrim((string) (config('app')['url'] ?? ''), '/')) ?>">
     <title><?= e($title ?? 'Elomiah') ?></title>
     <meta name="description" content="<?= e($metaDescription ?? 'Elomiah — refúgio de aromatizantes e perfumes de alto padrão. Onde o sagrado encontra a essência.') ?>">
     <meta property="og:title" content="<?= e($ogTitle ?? $title ?? 'Elomiah') ?>">
     <meta property="og:description" content="<?= e($ogDescription ?? 'Elomiah — onde o sagrado encontra a essência. Cinco névoas em vidro, 120 ml.') ?>">
     <meta property="og:image" content="<?= e($ogImage ?? asset('images/colecao-refugio.webp')) ?>">
     <meta property="og:type" content="website">
-    <link rel="icon" href="<?= e(asset('images/logo.png')) ?>?v=2" type="image/png">
-    <link rel="apple-touch-icon" href="<?= e(asset('images/logo.png')) ?>?v=2">
+    <link rel="icon" href="<?= e(asset('images/logo.png')) ?>?v=5" type="image/png">
+    <link rel="apple-touch-icon" href="<?= e(asset('images/logo.png')) ?>?v=5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=6">
     <style>
-      .splash{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#FDFBF6;transition:opacity .7s ease,visibility .7s ease}
+      .splash{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#FDFBF6;transition:opacity 1.35s cubic-bezier(.22,.61,.36,1),visibility 1.35s cubic-bezier(.22,.61,.36,1)}
       .splash.is-done{opacity:0;visibility:hidden;pointer-events:none}
+      html.splash-skip .splash,html.splash-ready .splash.is-done{pointer-events:none}
       html.splash-skip .splash{display:none}
     </style>
     <script>
@@ -28,16 +30,14 @@
 <body>
 <div class="splash" id="splash" role="status" aria-label="Carregando Elomiah">
     <div class="splash-inner">
-        <img src="<?= e(asset('images/logo.png')) ?>?v=2" alt="Elomiah Refúgio">
-        <p class="ornament">REFÚGIO</p>
-        <span class="splash-line" aria-hidden="true"></span>
+        <img src="<?= e(asset('images/logo.png')) ?>?v=5" alt="Elomiah — onde o sagrado encontra a essência">
     </div>
 </div>
 <a class="skip" href="#conteudo">Ir ao conteúdo</a>
 <header class="site-header">
     <div class="container">
         <a class="logo-link" href="<?= e(url('/')) ?>">
-            <img src="<?= e(asset('images/logo.png')) ?>?v=2" alt="Elomiah Refúgio">
+            <img src="<?= e(asset('images/logo.png')) ?>?v=5" alt="Elomiah">
         </a>
         <nav class="nav-main" aria-label="Principal">
             <a class="<?= is_active('/loja') ? 'is-active' : '' ?>" href="<?= e(url('/loja')) ?>">Loja</a>
@@ -69,7 +69,6 @@
     <div class="container footer-grid">
         <div>
             <div class="footer-brand">ELOMIAH</div>
-            <p class="ornament ornament-start">REFÚGIO</p>
             <p>Onde o sagrado encontra a essência.</p>
         </div>
         <div>
@@ -119,7 +118,7 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="<?= e(asset('js/spray.js')) ?>"></script>
 <?php endif; ?>
-<script src="<?= e(asset('js/app.js')) ?>"></script>
+<script src="<?= e(asset('js/app.js')) ?>?v=6"></script>
 <?php if (current_path() === '/checkout'): ?>
 <script src="<?= e(asset('js/cep.js')) ?>"></script>
 <?php endif; ?>

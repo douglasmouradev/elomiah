@@ -1,5 +1,3 @@
-USE `elomiah`;
-
 INSERT INTO `usuarios` (`nome`, `email`, `senha_hash`, `telefone`, `role`, `status`, `email_verified_at`) VALUES
 ('Geo Elomiah', 'admin@elomiah.com', '$2y$12$rGc715ufzNVkBWEmOgiOFewfCeGvvv4a2rmnFp9M9Wtbd9y2o3p1y', '11999999999', 'admin', 'ativo', NOW()),
 ('Ana Clara Mendes', 'ana@example.com', '$2y$12$rGc715ufzNVkBWEmOgiOFewfCeGvvv4a2rmnFp9M9Wtbd9y2o3p1y', '11988887777', 'cliente', 'ativo', NOW());

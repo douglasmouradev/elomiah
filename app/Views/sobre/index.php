@@ -3,8 +3,7 @@
     <p class="eyebrow">A origem</p>
     <h1>Sobre a Elomiah</h1>
 </section>
-<section class="container story">
-    <img class="geo-portrait" src="<?= e(asset('images/geo-real.webp')) ?>" alt="Geo, fundadora da Elomiah">
+<section class="container story story-text">
     <div>
         <p class="eyebrow">A fundadora</p>
         <h2>Geo</h2>

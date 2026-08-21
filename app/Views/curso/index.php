@@ -10,7 +10,13 @@ $curso = $curso ?? [];
 </section>
 
 <section class="container split-2">
-    <img src="<?= e(asset($curso['imagem'] ?? 'images/geo-real.webp')) ?>" alt="Geo no ateliê" style="width:100%;height:520px;object-fit:cover">
+    <?php
+    $cursoImg = (string) ($curso['imagem'] ?? '');
+    if ($cursoImg === '' || str_contains($cursoImg, 'geo-real') || str_contains($cursoImg, 'banner-achadinhos')) {
+        $cursoImg = 'images/colecao-refugio.webp';
+    }
+    ?>
+    <img src="<?= e(asset($cursoImg)) ?>" alt="Coleção Refúgio Elomiah" style="width:100%;height:520px;object-fit:cover">
     <div>
         <p class="eyebrow">O convite</p>
         <h2>Aprender a habitar o cheiro.</h2>

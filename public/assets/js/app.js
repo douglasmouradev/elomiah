@@ -12,21 +12,24 @@
 
   toggle?.addEventListener('click', () => nav?.classList.toggle('is-open'));
 
+  const appBase = (document.querySelector('meta[name="app-base"]')?.content || '').replace(/\/$/, '');
   const banner = document.querySelector('.cookie-banner');
   banner?.querySelectorAll('[data-cookie]').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const escolha = btn.getAttribute('data-cookie');
-      const token = document.querySelector('meta[name="csrf-token"]')?.content;
-      await fetch('/cookies/consentimento', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': token || '',
-        },
-        body: `_csrf=${encodeURIComponent(token || '')}&escolha=${encodeURIComponent(escolha)}`,
-      });
+      const escolha = btn.getAttribute('data-cookie') || 'essenciais';
+      const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
       banner.classList.remove('is-on');
+      try {
+        await fetch(appBase + '/cookies/consentimento', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': token,
+          },
+          body: `_csrf=${encodeURIComponent(token)}&escolha=${encodeURIComponent(escolha)}`,
+        });
+      } catch (_) {}
     });
   });
 
@@ -45,26 +48,38 @@
 
   const splash = document.getElementById('splash');
   const skipSplash = document.documentElement.classList.contains('splash-skip');
+  const fadeMs = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 280 : 1400;
+  let splashFechando = false;
   const revelar = () => {
-    document.documentElement.classList.add('splash-ready');
-    if (!splash) return;
+    if (splashFechando) return;
+    splashFechando = true;
+    if (!splash) {
+      document.documentElement.classList.add('splash-ready');
+      return;
+    }
     splash.classList.add('is-done');
     try { sessionStorage.setItem('elomiah_splash', '1'); } catch (e) {}
-    setTimeout(() => splash.remove(), 750);
+    // Libera o scroll só no fim do fade — evita o “tranco” no meio da transição.
+    setTimeout(() => {
+      document.documentElement.classList.add('splash-ready');
+      splash.remove();
+    }, fadeMs);
   };
 
   if (skipSplash) {
     document.documentElement.classList.add('splash-ready');
     splash?.remove();
   } else {
-    const minimo = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 200 : 1600;
+    const minimo = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 280 : 2800;
     const inicio = Date.now();
     const terminar = () => {
       const resto = Math.max(0, minimo - (Date.now() - inicio));
       setTimeout(revelar, resto);
     };
     if (document.readyState === 'complete') terminar();
-    else window.addEventListener('load', terminar);
+    else window.addEventListener('load', terminar, { once: true });
+    // Se o load travar no host, libera mesmo assim.
+    setTimeout(revelar, 6500);
   }
 
   const checkout = document.querySelector('[data-checkout]');

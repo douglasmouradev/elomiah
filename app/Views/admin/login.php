@@ -1,5 +1,5 @@
 <div class="admin-card">
-    <img src="<?= e(asset('images/logo.png')) ?>?v=2" alt="Elomiah" style="height:110px;margin:0 auto 1rem">
+    <img src="<?= e(asset('images/logo.png')) ?>?v=5" alt="Elomiah" style="height:120px;width:auto;max-width:min(280px,80vw);margin:0 auto 1rem;object-fit:contain">
     <h1 style="font-family:Playfair Display,serif;letter-spacing:.35em;font-size:1.1rem">ATELIÊ</h1>
     <?php if ($msg = flash('error')): ?><div class="alert alert-err"><?= e($msg) ?></div><?php endif; ?>
     <form class="form" method="post" action="<?= e(url('/admin/login')) ?>" style="text-align:left;margin-top:1.5rem">

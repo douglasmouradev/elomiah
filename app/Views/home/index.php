@@ -12,8 +12,8 @@ View::partial('partials/flash');
     <div class="hero-copy" data-parallax="0.08" data-dir="up">
         <p class="eyebrow">Coleção Refúgio</p>
         <h1 class="display">Elomiah</h1>
-        <p class="hero-refugio"><i></i><span>REFÚGIO</span><i></i></p>
-        <p class="lede">Onde o sagrado encontra a essência. Cinco névoas em vidro — Despertar, Recomeço, Encontro, Equilíbrio e Silêncio.</p>
+        <p class="hero-slogan"><i></i><span>Onde o sagrado encontra a essência.</span><i></i></p>
+        <p class="lede">Cinco névoas em vidro — Despertar, Recomeço, Encontro, Equilíbrio e Silêncio.</p>
         <div class="hero-actions">
             <a class="btn btn-gold" href="<?= e(url('/loja')) ?>">A coleção</a>
             <a class="btn btn-ghost" href="<?= e(url('/sobre')) ?>">A história</a>
@@ -34,8 +34,7 @@ View::partial('partials/flash');
 </section>
 
 <section>
-    <div class="container story">
-        <img class="geo-portrait" src="<?= e(asset('images/geo-real.webp')) ?>" alt="Geo, fundadora da Elomiah" data-parallax="0.04">
+    <div class="container story story-text">
         <div>
             <p class="eyebrow">A marca</p>
             <h2>Um refúgio, não uma vitrine.</h2>
@@ -51,7 +50,6 @@ View::partial('partials/flash');
     <div class="container">
         <div class="section-head">
             <p class="eyebrow">A vitrine</p>
-            <div class="ornament">REFÚGIO</div>
             <h2>Coleção Refúgio</h2>
             <p class="lede lede-center">Cinco aromas, um mesmo ritual. Mais o Elo, para os primeiros capítulos.</p>
         </div>

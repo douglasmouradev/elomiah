@@ -51,7 +51,7 @@ final class NotaCompra
             . '<div style="max-width:640px;margin:0 auto;padding:40px 28px 64px;font-family:Georgia,\'Times New Roman\',serif">'
             . $acoes
             . '<p style="margin:0 0 4px;letter-spacing:.38em;font-size:11px;color:#C9A24B">ELOMIAH</p>'
-            . '<p style="margin:0 0 28px;font-size:12px;letter-spacing:.22em;color:#5C6B61">REFÚGIO</p>'
+            . '<p style="margin:0 0 28px;font-size:13px;color:#5C6B61">Onde o sagrado encontra a essência.</p>'
             . '<h1 style="margin:0 0 8px;font-size:28px;font-weight:400;letter-spacing:.04em">Recibo de compra</h1>'
             . '<p style="margin:0 0 28px;font-size:14px;color:#5C6B61">' . e($numero) . ' · Pedido ' . e($codigo) . ' · ' . e($data) . '</p>'
             . self::emitente($razao, $cnpj, $ie, $endAtelie)

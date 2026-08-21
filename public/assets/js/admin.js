@@ -21,6 +21,7 @@
   const list = root.querySelector('[data-notify-list]');
   const countEl = root.querySelector('[data-notify-count]');
   const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+  const appBase = (document.querySelector('meta[name="app-base"]')?.content || '').replace(/\/$/, '');
   const tituloBase = document.title.replace(/^\(\d+\)\s/, '');
   let visto = Number(countEl?.textContent || 0);
 
@@ -76,7 +77,7 @@
 
   const puxar = async () => {
     try {
-      const res = await fetch('/admin/notificacoes', { headers, cache: 'no-store' });
+      const res = await fetch(appBase + '/admin/notificacoes', { headers, cache: 'no-store' });
       const data = await res.json();
       if (!data || !data.ok) return;
       render(data.itens || []);
@@ -103,7 +104,7 @@
     if (!item) return;
     const id = item.getAttribute('data-notify-id');
     try {
-      await fetch(`/admin/notificacoes/${id}/lida`, {
+      await fetch(`${appBase}/admin/notificacoes/${id}/lida`, {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `_csrf=${encodeURIComponent(token)}`,
@@ -112,7 +113,7 @@
   });
 
   root.querySelector('[data-notify-all]')?.addEventListener('click', async () => {
-    await fetch('/admin/notificacoes/lidas', {
+    await fetch(appBase + '/admin/notificacoes/lidas', {
       method: 'POST',
       headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `_csrf=${encodeURIComponent(token)}`,
