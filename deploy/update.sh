@@ -8,7 +8,7 @@ APP_USER="elomiah"
 BACKUP_DIR="/var/backups/elomiah/$(date +%Y%m%d-%H%M%S)"
 
 cd "$APP_DIR"
-BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+BRANCH="$(runuser -u "$APP_USER" -- git rev-parse --abbrev-ref HEAD)"
 
 echo "==> Backup em ${BACKUP_DIR}"
 mkdir -p "$BACKUP_DIR"
