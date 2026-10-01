@@ -20,7 +20,7 @@ export function InitialsAvatar({
   return (
     <div
       className={cn(
-        "flex items-center justify-center bg-elomiah-surface font-display text-elomiah-green",
+        "flex items-center justify-center rounded-full border border-elomiah-gold/30 bg-elomiah-surface font-display text-elomiah-green",
         className
       )}
       aria-hidden

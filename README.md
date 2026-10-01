@@ -35,18 +35,20 @@ Opcionais: Instagram, e-mails, URLs de marketplaces, `NEXT_PUBLIC_GA_ID`.
 
 ## Checklist de produção (ordem)
 
-1. **Foto da Geo** — salve `public/images/geo.jpg` (a página Sobre troca automaticamente)
-2. **Fotos dos Achadinhos** — upload no admin ou `public/images/achadinhos/`
-3. **Supabase** (persistência na Vercel):
+Conteúdo visual já está no repositório (Achadinhos, Sobre e depoimentos). No ar, complete:
+
+1. **Supabase** (obrigatório na Vercel):
    - Crie projeto em [supabase.com](https://supabase.com)
    - Rode `supabase/schema.sql` no SQL Editor
    - Storage → bucket público `uploads`
    - Preencha `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
-4. **Marketplaces** — `NEXT_PUBLIC_SHOPEE_URL`, `AMAZON`, `MERCADOLIVRE`
-5. **Depoimentos reais** — aba Depoimentos no admin
-6. **Estoque** — ajuste no admin (valores iniciais já são realistas)
-7. **Kit Refúgio** — já no catálogo (`/produtos/kit-refugio`)
-8. **GA4** — `NEXT_PUBLIC_GA_ID` (eventos: add_to_cart, begin_checkout, buy_now_whatsapp)
+2. **URLs públicas** — `NEXT_PUBLIC_SITE_URL=https://elomiah.com.br`
+3. **Senhas fortes** — `ADMIN_PASSWORD` e `ADMIN_SECRET` (não use os valores de desenvolvimento)
+4. **GA4** — `NEXT_PUBLIC_GA_ID` (eventos: add_to_cart, begin_checkout, buy_now_whatsapp, purchase)
+5. **Marketplaces** — `NEXT_PUBLIC_SHOPEE_URL`, `AMAZON`, `MERCADOLIVRE` (só se a marca vender lá)
+6. **Foto oficial da Geo** — se quiser, troque `public/images/geo.jpg`
+7. **Depoimentos reais** — troque textos/fotos no admin quando tiverem autorização
+8. **Estoque** — ajuste no admin
 9. Frete estimado por CEP — já no carrinho
 
 O admin mostra o status desse checklist após o login.

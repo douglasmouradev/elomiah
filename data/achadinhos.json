@@ -3,7 +3,7 @@
     "id": "a1",
     "name": "Vela de Cera de Abelha Artesanal",
     "price": 64.9,
-    "image": "",
+    "image": "/images/achadinhos/vela.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Selecionada pela Geo para rituais de anoitecer — chama estável e aroma de mel suave."
@@ -12,7 +12,7 @@
     "id": "a2",
     "name": "Óleo Essencial de Lavanda Francesa",
     "price": 52.0,
-    "image": "",
+    "image": "/images/achadinhos/lavanda.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Lavanda de altitude, pura. Ideal para difusão e banhos de reconexão."
@@ -21,7 +21,7 @@
     "id": "a3",
     "name": "Bandeja de Madeira Clara",
     "price": 119.0,
-    "image": "",
+    "image": "/images/achadinhos/bandeja.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Base para o altar doméstico — madeira clara, veios naturais, acabamento fosco."
@@ -30,7 +30,7 @@
     "id": "a4",
     "name": "Sabonete de Argila e Alecrim",
     "price": 38.5,
-    "image": "",
+    "image": "/images/achadinhos/sabonete.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Limpeza ritualística com argila verde e alecrim fresco."
@@ -39,7 +39,7 @@
     "id": "a5",
     "name": "Incenso Natural de Palo Santo",
     "price": 45.0,
-    "image": "",
+    "image": "/images/achadinhos/incenso.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Para abrir espaços: madeira sagrada, fumaça suave, intenção clara."
@@ -48,7 +48,7 @@
     "id": "a6",
     "name": "Copo de Cerâmica Artesanal",
     "price": 78.0,
-    "image": "",
+    "image": "/images/achadinhos/copo.jpg",
     "marketplace": "collshop",
     "url": "https://collshp.com/geovanaferreira030789?view=storefront",
     "description": "Para chás e rituais de manhã — esmaltado à mão, tom creme."

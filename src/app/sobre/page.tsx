@@ -23,7 +23,7 @@ async function resolveGeoImage(): Promise<{
       return {
         src: `/images/${file}`,
         alt: "Geo, fundadora da Elomiah",
-        caption: "Geo — fundadora da Elomiah.",
+        caption: "Geo no ateliê da Elomiah.",
       };
     } catch {
       /* next candidate */

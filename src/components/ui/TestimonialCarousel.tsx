@@ -38,7 +38,7 @@ export function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) 
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="grid gap-10 md:grid-cols-[auto_1fr] md:items-start md:gap-12"
           >
-            <div className="relative mx-auto h-16 w-16 shrink-0 overflow-hidden md:mx-0 md:h-20 md:w-20">
+            <div className="relative mx-auto h-16 w-16 shrink-0 overflow-hidden rounded-full md:mx-0 md:h-20 md:w-20">
               {current.photo ? (
                 <Image
                   src={current.photo}

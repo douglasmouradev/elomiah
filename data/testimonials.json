@@ -2,7 +2,7 @@
   {
     "id": "t1",
     "name": "Mariana S.",
-    "photo": "",
+    "photo": "/images/depoimentos/mariana.jpg",
     "rating": 5,
     "text": "O Despertar transformou meu ritual matinal. Cada borrifada é um convite à pausa — sinto o sagrado no cotidiano.",
     "role": "Cliente desde 2025"
@@ -10,7 +10,7 @@
   {
     "id": "t2",
     "name": "Camila R.",
-    "photo": "",
+    "photo": "/images/depoimentos/camila.jpg",
     "rating": 5,
     "text": "O Silêncio é delicadeza pura. O aroma âmbar traz quietude para casa — exatamente o que eu buscava.",
     "role": "Aluna do curso"
@@ -18,7 +18,7 @@
   {
     "id": "t3",
     "name": "Helena M.",
-    "photo": "",
+    "photo": "/images/depoimentos/helena.jpg",
     "rating": 5,
     "text": "Os Achadinhos da Geo são uma curadoria de verdade. Cada indicação parece feita para o meu ritual pessoal.",
     "role": "Cliente"
@@ -26,7 +26,7 @@
   {
     "id": "t4",
     "name": "Beatriz L.",
-    "photo": "",
+    "photo": "/images/depoimentos/beatriz.jpg",
     "rating": 5,
     "text": "A Coleção Refúgio chegou como um presente para mim mesma. Embalagem impecável, aromas inesquecíveis.",
     "role": "Cliente desde 2024"
@@ -34,7 +34,7 @@
   {
     "id": "t5",
     "name": "Ana Paula",
-    "photo": "",
+    "photo": "/images/depoimentos/ana.jpg",
     "rating": 5,
     "text": "A Geo transmite cuidado em cada detalhe. A Elomiah não é só perfume — é um refúgio olfativo.",
     "role": "Aluna do curso"
