@@ -105,8 +105,8 @@ SQL
 TABLES="$(mysql -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}'")"
 if [[ "$TABLES" == "0" ]]; then
   echo "   banco vazio: criando tabelas e dados iniciais"
-  mysql < database/schema.sql
-  mysql "$DB_NAME" < database/seed.sql
+  mysql --default-character-set=utf8mb4 < database/schema.sql
+  mysql --default-character-set=utf8mb4 "$DB_NAME" < database/seed.sql
 else
   echo "   banco já tem ${TABLES} tabelas; mantendo os dados"
 fi
