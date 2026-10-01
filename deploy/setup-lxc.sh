@@ -29,6 +29,11 @@ echo "==> Usuário ${APP_USER}"
 id "$APP_USER" >/dev/null 2>&1 || useradd --system --create-home --shell /usr/sbin/nologin "$APP_USER"
 
 echo "==> Código em ${APP_DIR}"
+if [[ -d "$APP_DIR" && ! -d "$APP_DIR/.git" ]]; then
+  OLD_DIR="${APP_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
+  echo "   ${APP_DIR} já existe e não é um repositório git; movendo para ${OLD_DIR}"
+  mv "$APP_DIR" "$OLD_DIR"
+fi
 if [[ ! -d "$APP_DIR/.git" ]]; then
   git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
 fi
