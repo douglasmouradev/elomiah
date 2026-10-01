@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO_URL="${1:-https://github.com/douglasmouradev/elomiah.git}"
-BRANCH="${2:-master}"
+BRANCH="${2:-main}"
 APP_DIR="/opt/elomiah"
 APP_USER="elomiah"
 NODE_MAJOR="20"
