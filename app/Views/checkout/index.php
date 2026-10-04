@@ -99,6 +99,6 @@ $freteInfo = $freteInfo ?? frete();
             <div class="totals-total"><dt>Total</dt><dd><?= e(money($total ?? 0)) ?></dd></div>
         </dl>
         <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
-        <p class="field-hint">Pix ou cartão · troca em 7 dias.</p>
+        <p class="field-hint"><?= e(formas_pagamento()) ?> · troca em 7 dias.</p>
     </aside>
 </section>

@@ -37,7 +37,7 @@ View::partial('partials/flash');
             <li class="shelf-item" style="--c:<?= e($cor) ?>" data-nevoa="<?= e($cor) ?>">
                 <a href="<?= e(url('/produto/' . $p['slug'])) ?>">
                     <span class="shelf-photo">
-                        <img src="<?= e(asset($p['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="" width="250" height="450" <?= $i < 3 ? 'fetchpriority="high"' : 'loading="lazy"' ?> decoding="async">
+                        <img class="vt-frasco" data-vt="frasco-<?= (int) $p['id'] ?>" src="<?= e(asset($p['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="" width="250" height="450" <?= $i < 3 ? 'fetchpriority="high"' : 'loading="lazy"' ?> decoding="async">
                     </span>
                     <span class="shelf-name rotulo"><?= e($p['nome']) ?></span>
                     <span class="shelf-aroma"><?= e($p['aroma'] ?? '') ?></span>
@@ -52,7 +52,7 @@ View::partial('partials/flash');
 <section class="container">
     <div class="elo-row" data-nevoa="<?= e($corElo) ?>">
         <figure>
-            <img src="<?= e(asset($elo['imagem'] ?? 'images/frasco-elo.webp')) ?>" alt="Frasco do Elo, spray de algodão e camomila" width="400" height="500" loading="lazy" decoding="async">
+            <img class="vt-frasco" data-vt="frasco-<?= (int) $elo['id'] ?>" src="<?= e(asset($elo['imagem'] ?? 'images/frasco-elo.webp')) ?>" alt="Frasco do Elo, spray de algodão e camomila" width="400" height="500" loading="lazy" decoding="async">
         </figure>
         <div>
             <p class="eyebrow">Coleção Elo</p>

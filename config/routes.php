@@ -122,6 +122,7 @@ return static function (Router $router): void {
     $router->post('/admin/pagamento', [AdminFinanceiroController::class, 'update'], $admin);
     $router->post('/admin/despacho', [AdminFinanceiroController::class, 'despacho'], $admin);
     $router->post('/admin/pix', [AdminFinanceiroController::class, 'pix'], $admin);
+    $router->post('/admin/vitrine', [AdminFinanceiroController::class, 'vitrine'], $admin);
     $router->post('/admin/loja', [AdminFinanceiroController::class, 'loja'], $admin);
 
     $router->get('/admin/logs', [LogController::class, 'index'], $admin);

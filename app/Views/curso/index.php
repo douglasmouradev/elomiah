@@ -22,7 +22,7 @@ $modulos = $modulos ?? [];
         <ul class="product-assurance">
             <li><?= count($modulos) ?: 6 ?> módulos gravados</li>
             <li>Acesso por 12 meses nesta conta</li>
-            <li>Pagamento por Pix ou cartão</li>
+            <li>Pagamento por <?= e(mb_strtolower(formas_pagamento())) ?></li>
         </ul>
         <p class="curso-preco"><?= e(money($curso['preco'] ?? 0)) ?></p>
         <form method="post" action="<?= e(url('/curso/matricular')) ?>">

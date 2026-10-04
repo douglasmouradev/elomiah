@@ -27,6 +27,7 @@ final class FinanceiroController extends Controller
             'frete' => Configuracao::frete(),
             'pix' => Configuracao::pix(),
             'loja' => Configuracao::loja(),
+            'vitrine' => Configuracao::vitrine(),
         ], 'layouts/admin');
     }
 
@@ -60,6 +61,18 @@ final class FinanceiroController extends Controller
         Configuracao::setFrete($valor, $nome, $prazo);
         Auth::log('Atualizou o despacho', 'configuracoes', null);
         Session::setFlash('success', 'Despacho atualizado. O checkout já usa este valor.');
+        redirect('/admin/pagamento');
+    }
+
+    public function vitrine(Request $request, array $params = []): never
+    {
+        Configuracao::setVitrine(
+            (float) str_replace(',', '.', (string) $request->input('frete_gratis_acima', '0')),
+            (string) $request->input('faixa_avisos', ''),
+            (string) $request->input('atendimento_horario', '')
+        );
+        Auth::log('Atualizou a vitrine da loja', 'configuracoes', null);
+        Session::setFlash('success', 'Vitrine atualizada. O site já mostra as mudanças.');
         redirect('/admin/pagamento');
     }
 

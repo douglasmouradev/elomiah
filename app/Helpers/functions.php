@@ -176,6 +176,10 @@ function frete_do_carrinho(array $carrinho): array
 {
     $frete = frete();
     if (carrinho_requer_envio($carrinho)) {
+        $limite = \App\Models\Configuracao::vitrine()['frete_gratis'];
+        if ($limite > 0 && (float) ($carrinho['total'] ?? 0) >= $limite) {
+            return ['valor' => 0.0, 'nome' => 'Frete grátis', 'prazo' => $frete['prazo']];
+        }
         return $frete;
     }
 
@@ -184,6 +188,27 @@ function frete_do_carrinho(array $carrinho): array
         'nome' => 'Acesso digital',
         'prazo' => 'Sem despacho · o acesso libera nesta conta depois do pagamento',
     ];
+}
+
+/** @return array{ativo: bool, limite: float, falta: float, pct: int, atingido: bool} */
+function frete_gratis_progresso(array $carrinho): array
+{
+    $limite = \App\Models\Configuracao::vitrine()['frete_gratis'];
+    $total = (float) ($carrinho['total'] ?? 0);
+    $ativo = $limite > 0 && carrinho_requer_envio($carrinho);
+
+    return [
+        'ativo' => $ativo,
+        'limite' => $limite,
+        'falta' => $ativo ? max(0, $limite - $total) : 0.0,
+        'pct' => $ativo ? (int) min(100, round($total / $limite * 100)) : 0,
+        'atingido' => $ativo && $total >= $limite,
+    ];
+}
+
+function formas_pagamento(): string
+{
+    return \App\Support\MercadoPago::configurado() ? 'Pix ou cartão' : 'Pix';
 }
 
 function slugify(string $text): string

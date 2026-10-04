@@ -47,6 +47,12 @@ $logado = \App\Core\Auth::check();
             </ul>
             <aside class="cart-totals" aria-labelledby="resumo-titulo">
                 <h2 id="resumo-titulo">Resumo</h2>
+                <?php if (!empty($freteGratis['ativo'])): ?>
+                    <div class="frete-gratis<?= $freteGratis['atingido'] ? ' is-ok' : '' ?>">
+                        <p><?php if ($freteGratis['atingido']): ?>Você ganhou <strong>frete grátis</strong>.<?php else: ?>Faltam <strong><?= e(money($freteGratis['falta'])) ?></strong> para o frete grátis.<?php endif; ?></p>
+                        <span class="frete-barra" aria-hidden="true"><i style="--pct:<?= (int) $freteGratis['pct'] ?>"></i></span>
+                    </div>
+                <?php endif; ?>
                 <dl class="totals">
                     <div><dt>Aromas</dt><dd><?= e(money($carrinho['total'])) ?></dd></div>
                     <div><dt><?= e($freteInfo['nome']) ?></dt><dd><?= e(money($freteInfo['valor'])) ?></dd></div>
@@ -54,7 +60,7 @@ $logado = \App\Core\Auth::check();
                 </dl>
                 <a class="btn btn-gold" href="<?= e(url('/checkout')) ?>"><?= $logado ? 'Finalizar compra' : 'Entrar e finalizar' ?></a>
                 <p class="field-hint"><?= e(rtrim((string) $freteInfo['prazo'], '. ')) ?>.<?= $logado ? '' : ' Para finalizar você entra ou cria uma conta; a sacola continua aqui.' ?></p>
-                <p class="field-hint">Pix ou cartão · troca em 7 dias.</p>
+                <p class="field-hint"><?= e(formas_pagamento()) ?> · troca em 7 dias.</p>
             </aside>
         </div>
         <p><a class="text-back" href="<?= e(url('/loja')) ?>">Continuar escolhendo</a></p>

@@ -71,6 +71,35 @@ final class Configuracao extends Model
         self::set('frete_prazo', $prazo);
     }
 
+    /** @return array{frete_gratis: float, avisos: list<string>, atendimento: string} */
+    public static function vitrine(): array
+    {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+        $avisos = preg_split('/\R/', (string) self::get('faixa_avisos', '')) ?: [];
+        $avisos = array_values(array_filter(array_map('trim', $avisos), static fn ($a) => $a !== ''));
+
+        return $cache = [
+            'frete_gratis' => max(0, (float) self::get('frete_gratis_acima', '0')),
+            'avisos' => array_slice($avisos, 0, 3),
+            'atendimento' => trim((string) self::get('atendimento_horario', '')),
+        ];
+    }
+
+    public static function setVitrine(float $freteGratis, string $avisos, string $atendimento): void
+    {
+        $linhas = preg_split('/\R/', $avisos) ?: [];
+        $linhas = array_slice(array_values(array_filter(array_map(
+            static fn ($l) => mb_substr(trim($l), 0, 90),
+            $linhas
+        ), static fn ($l) => $l !== '')), 0, 3);
+        self::set('frete_gratis_acima', number_format(max(0, round($freteGratis, 2)), 2, '.', ''));
+        self::set('faixa_avisos', implode("\n", $linhas));
+        self::set('atendimento_horario', mb_substr(trim($atendimento), 0, 120));
+    }
+
     public static function pix(): array
     {
         $cfg = config('app');

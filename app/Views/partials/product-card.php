@@ -8,7 +8,7 @@ $noCarrinho = ($p['compra_tipo'] ?? 'carrinho') === 'carrinho' && !produto_digit
 ?>
 <article class="product-card" style="--c:<?= e($cor) ?>" data-nevoa="<?= e($cor) ?>">
     <a class="thumb" href="<?= e($link) ?>" tabindex="-1" aria-hidden="true">
-        <img src="<?= e(asset($img)) ?>" alt="" width="400" height="500" loading="lazy" decoding="async">
+        <img class="vt-frasco" data-vt="frasco-<?= (int) $p['id'] ?>" src="<?= e(asset($img)) ?>" alt="" width="400" height="500" loading="lazy" decoding="async">
     </a>
     <div class="product-info">
         <h3 class="rotulo"><a href="<?= e($link) ?>"><?= e($p['nome']) ?></a></h3>

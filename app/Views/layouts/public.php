@@ -1,7 +1,14 @@
 <?php
-$v = '7';
+$v = '10';
 $logado = \App\Core\Auth::check();
 $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
+$vitrine = \App\Models\Configuracao::vitrine();
+$avisos = $vitrine['avisos'];
+if ($vitrine['frete_gratis'] > 0) {
+    array_unshift($avisos, 'Frete grátis nas compras acima de ' . money($vitrine['frete_gratis']));
+}
+$loja = \App\Models\Configuracao::loja();
+$cartao = \App\Support\MercadoPago::configurado();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -22,11 +29,52 @@ $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
     <link rel="preload" href="<?= e(asset('fonts/marcellus-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="<?= e(asset('fonts/hanken-grotesk-var.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=<?= $v ?>">
-    <script>document.documentElement.classList.add('js');</script>
+    <script>
+      (function (d) {
+        d.classList.add('js');
+        try {
+          if (!sessionStorage.getItem('elomiah_abertura') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            d.classList.add('com-abertura');
+            sessionStorage.setItem('elomiah_abertura', '1');
+          }
+        } catch (e) {}
+      })(document.documentElement);
+      addEventListener('pagereveal', function (e) {
+        if (!e.viewTransition || !window.navigation || !navigation.activation || !navigation.activation.from) return;
+        var m = /\/produto\/[^/?#]+/.exec(navigation.activation.from.url || '');
+        if (!m) return;
+        var img = null;
+        document.querySelectorAll('.product-card, .shelf-item, .elo-row').forEach(function (bloco) {
+          if (img) return;
+          var a = bloco.querySelector('a[href$="' + m[0] + '"]');
+          if (a) img = bloco.querySelector('.vt-frasco[data-vt]');
+        });
+        if (!img) return;
+        img.style.viewTransitionName = img.dataset.vt;
+        e.viewTransition.finished.finally(function () { img.style.viewTransitionName = ''; });
+      });
+    </script>
+    <link rel="expect" href="#fim-conteudo" blocking="render">
 </head>
 <body>
+<div class="abertura" aria-hidden="true">
+    <div class="abertura-marca">
+        <img src="<?= e(asset('images/logo-elomiah-compacta.svg')) ?>" alt="" width="208" height="80">
+        <span class="abertura-linha"></span>
+        <p>Onde o sagrado encontra a essência.</p>
+    </div>
+</div>
 <div class="nevoa" aria-hidden="true"><i></i><i></i></div>
 <a class="skip" href="#conteudo">Ir ao conteúdo</a>
+<?php if ($avisos): ?>
+<div class="faixa" role="region" aria-label="Avisos da loja">
+    <ul class="faixa-lista" data-faixa>
+        <?php foreach ($avisos as $i => $aviso): ?>
+            <li class="<?= $i === 0 ? 'is-on' : '' ?>"><?= e($aviso) ?></li>
+        <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
 <header class="site-header">
     <div class="container">
         <a class="logo-link" href="<?= e(url('/')) ?>" aria-label="Elomiah, página inicial">
@@ -65,12 +113,13 @@ $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
 </header>
 <main id="conteudo">
     <?= $content ?? '' ?>
+    <span id="fim-conteudo" hidden></span>
 </main>
 <footer class="site-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
             <img src="<?= e(asset('images/logo-elomiah-compacta-clara.svg')) ?>" alt="Elomiah" width="115" height="44" loading="lazy">
-            <p>Sprays de ambiente em vidro, formulados em pequenos lotes pela Geo. Pix ou cartão, troca em 7 dias.</p>
+            <p>Sprays de ambiente em vidro, formulados em pequenos lotes pela Geo.</p>
         </div>
         <div>
             <h2 class="footer-title">Loja</h2>
@@ -82,18 +131,38 @@ $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
             </ul>
         </div>
         <div>
-            <h2 class="footer-title">Ajuda</h2>
+            <h2 class="footer-title">Sua compra</h2>
             <ul>
-                <li><a href="<?= e(url('/contato')) ?>">Contato</a></li>
-                <li><a href="<?= e($wa) ?>" rel="noopener" target="_blank">WhatsApp</a></li>
-                <li><a href="https://instagram.com/elomiah" rel="noopener" target="_blank">Instagram</a></li>
                 <li><a href="<?= e(url('/conta')) ?>">Meus pedidos</a></li>
+                <li><?= e(rtrim((string) frete()['prazo'], '. ')) ?></li>
+                <li>Troca em até 7 dias</li>
                 <li><a href="<?= e(url('/meus-dados')) ?>">Seus dados (LGPD)</a></li>
             </ul>
         </div>
+        <div>
+            <h2 class="footer-title">Atendimento</h2>
+            <ul>
+                <li><a href="<?= e($wa) ?>" rel="noopener" target="_blank">WhatsApp</a></li>
+                <li><a href="<?= e(url('/contato')) ?>">Formulário de contato</a></li>
+                <li><a href="https://instagram.com/elomiah" rel="noopener" target="_blank">Instagram @elomiah</a></li>
+                <?php if ($vitrine['atendimento'] !== ''): ?><li class="footer-horario"><?= e($vitrine['atendimento']) ?></li><?php endif; ?>
+            </ul>
+        </div>
+    </div>
+    <div class="container footer-pay">
+        <h2 class="footer-title">Formas de pagamento</h2>
+        <ul class="pay-badges">
+            <li>Pix</li>
+            <?php if ($cartao): ?>
+                <li>Visa</li>
+                <li>Mastercard</li>
+                <li>Elo</li>
+                <li>Até 6x no cartão</li>
+            <?php endif; ?>
+        </ul>
     </div>
     <div class="container footer-bottom">
-        <span>© <?= date('Y') ?> Elomiah</span>
+        <span>© <?= date('Y') ?> <?= e($loja['razao']) ?><?php if ($loja['cnpj'] !== ''): ?> · CNPJ <?= e($loja['cnpj']) ?><?php endif; ?><?php if ($loja['endereco'] !== ''): ?> · <?= e($loja['endereco']) ?><?php endif; ?></span>
         <span><a href="<?= e(url('/privacidade')) ?>">Privacidade</a> &nbsp; <a href="<?= e(url('/termos')) ?>">Termos de uso</a></span>
     </div>
 </footer>

@@ -20,6 +20,7 @@ final class CarrinhoController extends Controller
             'title' => 'Sacola — Elomiah',
             'carrinho' => $carrinho,
             'freteInfo' => $frete,
+            'freteGratis' => frete_gratis_progresso($carrinho),
             'estimado' => $carrinho['total'] + $frete['valor'],
         ]);
     }
@@ -123,6 +124,10 @@ final class CarrinhoController extends Controller
             'pecas' => money($carrinho['total']),
             'frete' => ['nome' => $frete['nome'], 'valor' => money($frete['valor']), 'prazo' => $frete['prazo']],
             'total' => money($carrinho['total'] + $frete['valor']),
+            'freteGratis' => (static function (array $p): array {
+                $p['falta'] = money($p['falta']);
+                return $p;
+            })(frete_gratis_progresso($carrinho)),
             'logado' => \App\Core\Auth::check(),
         ];
     }

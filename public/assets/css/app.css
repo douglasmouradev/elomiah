@@ -332,6 +332,75 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 }
 .nevoa i.is-on { opacity: 1; }
 
+/* ========== Abertura (1ª página da visita) ========== */
+.abertura { display: none; }
+.com-abertura .abertura {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  background: var(--vidro);
+  cursor: pointer;
+  animation: abertura-sai var(--d-3) var(--ease-inout) 1300ms forwards;
+}
+.abertura-marca { display: grid; justify-items: center; gap: var(--s-2); text-align: center; }
+.abertura-marca img {
+  width: clamp(160px, 22vw, 208px);
+  height: auto;
+  animation: subir var(--d-4) var(--ease-out) 80ms both;
+}
+.abertura-linha {
+  width: 72px;
+  height: 1px;
+  background: var(--metal);
+  transform-origin: center;
+  animation: abertura-linha var(--d-4) var(--ease-out) 320ms both;
+}
+.abertura-marca p {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-md);
+  color: var(--tinta-suave);
+  animation: abertura-texto var(--d-4) var(--ease-out) 520ms both;
+}
+.abertura.is-fora { animation: abertura-sai var(--d-2) var(--ease-out) forwards; }
+@keyframes abertura-linha { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes abertura-texto { from { opacity: 0; } to { opacity: 1; } }
+@keyframes abertura-sai {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+/* ========== Faixa de avisos ========== */
+.faixa {
+  background: var(--tinta);
+  color: var(--papel);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+.faixa-lista {
+  display: grid;
+  margin: 0 auto;
+  padding: 0 var(--margem);
+  list-style: none;
+}
+.faixa-lista li {
+  grid-area: 1 / 1;
+  padding: 9px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity var(--d-3) var(--ease-out), transform var(--d-3) var(--ease-out), visibility 0s linear var(--d-3);
+}
+.faixa-lista li.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
 /* ========== Topo ========== */
 .site-header {
   position: sticky;
@@ -439,7 +508,7 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 .site-footer :focus-visible { outline-color: var(--papel); }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
   gap: var(--s-5) var(--calha);
 }
 .footer-brand img { height: 44px; width: auto; margin-bottom: var(--s-2); }
@@ -454,6 +523,23 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-1); }
 .site-footer a { color: inherit; text-decoration: none; }
 .site-footer a:hover { color: var(--papel); text-decoration: underline; }
+.footer-horario { color: rgba(251, 250, 246, 0.66); }
+.footer-pay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  margin-top: var(--s-5);
+}
+.footer-pay .footer-title { margin: 0; }
+.site-footer .pay-badges { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.pay-badges li {
+  padding: 3px 12px;
+  border: 1px solid rgba(251, 250, 246, 0.28);
+  border-radius: var(--raio-pilula);
+  font-size: var(--t-xs);
+  color: var(--papel);
+}
 .footer-bottom {
   display: flex;
   flex-wrap: wrap;
@@ -465,6 +551,27 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   font-size: var(--t-xs);
   color: rgba(251, 250, 246, 0.66);
 }
+
+/* ========== Frete grátis ========== */
+.frete-gratis { margin: 0 0 var(--s-2); }
+.frete-gratis p { margin: 0 0 var(--s-1); font-size: var(--t-sm); }
+.frete-gratis strong { font-weight: 600; }
+.frete-barra {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--raio-pilula);
+  background: var(--linha);
+}
+.frete-barra i {
+  display: block;
+  height: 100%;
+  background: var(--metal);
+  transform: scaleX(calc(var(--pct, 0) / 100));
+  transform-origin: left;
+  transition: transform var(--d-4) var(--ease-out);
+}
+.frete-gratis.is-ok .frete-barra i { background: var(--tinta); }
 
 /* ========== Home: prateleira ========== */
 .shelf { padding-top: var(--s-5) !important; padding-bottom: var(--s-6) !important; }
@@ -518,14 +625,15 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 @media (prefers-reduced-motion: no-preference) {
   .js .shelf-item, .js .shelf-head > * {
     animation: subir var(--d-4) var(--ease-out) both;
+    animation-delay: calc(var(--atraso, 0ms) + var(--apos-abertura, 0ms));
   }
-  .js .shelf-item:nth-child(1) { animation-delay: 0ms; }
-  .js .shelf-item:nth-child(2) { animation-delay: 60ms; }
-  .js .shelf-item:nth-child(3) { animation-delay: 120ms; }
-  .js .shelf-item:nth-child(4) { animation-delay: 180ms; }
-  .js .shelf-item:nth-child(5) { animation-delay: 240ms; }
-  .js .shelf-head > :nth-child(1) { animation-delay: 80ms; }
-  .js .shelf-head > :nth-child(2) { animation-delay: 160ms; }
+  .com-abertura { --apos-abertura: 1350ms; }
+  .js .shelf-item:nth-child(2) { --atraso: 60ms; }
+  .js .shelf-item:nth-child(3) { --atraso: 120ms; }
+  .js .shelf-item:nth-child(4) { --atraso: 180ms; }
+  .js .shelf-item:nth-child(5) { --atraso: 240ms; }
+  .js .shelf-head > :nth-child(1) { --atraso: 80ms; }
+  .js .shelf-head > :nth-child(2) { --atraso: 160ms; }
 }
 @keyframes subir {
   from { opacity: 0; transform: translateY(12px); }
@@ -724,12 +832,16 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   position: relative;
   height: min(800px, calc(100vh - var(--altura-topo) - var(--s-6)));
   min-height: 420px;
+  display: flex;
+  justify-content: center;
   overflow: hidden;
   cursor: zoom-in;
 }
 .gallery-main img {
-  width: 100%; height: 100%;
-  object-fit: contain;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
   transform-origin: var(--zx, 50%) var(--zy, 50%);
   transition: transform var(--d-3) var(--ease-out), opacity var(--d-2) var(--ease-out);
 }
@@ -1100,6 +1212,7 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   font-size: var(--t-sm);
 }
 .cookie-banner.is-on { display: block; animation: subir var(--d-3) var(--ease-out) both; }
+.com-abertura .cookie-banner.is-on { animation-delay: 1900ms; }
 .cookie-banner p { margin: 0 0 var(--s-2); }
 .cookie-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1); }
 .cookie-actions .btn { min-height: 40px; padding: 0 var(--s-2); }
@@ -1109,6 +1222,18 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 @view-transition { navigation: auto; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 240ms; animation-timing-function: var(--ease-out); }
 .site-header { view-transition-name: topo; }
+.vt-frasco { view-transition-class: frasco; }
+::view-transition-group(*.frasco) {
+  animation-duration: 560ms;
+  animation-timing-function: var(--ease-inout);
+}
+::view-transition-old(*.frasco), ::view-transition-new(*.frasco) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation-duration: 560ms;
+  animation-timing-function: var(--ease-inout);
+}
 
 /* ========== Responsivo ========== */
 @media (max-width: 1080px) {
@@ -1150,7 +1275,7 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   .course-band { grid-template-columns: 1fr; }
   .course-band img { min-height: 240px; max-height: 320px; }
   .elo-row { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); padding: var(--s-3); }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr 1fr; }
   .footer-grid > :first-child { grid-column: 1 / -1; }
 }
 
@@ -1198,7 +1323,7 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   .modulo { grid-template-columns: 40px minmax(0, 1fr); }
   .modulo > span { grid-column: 2; }
   .cookie-banner { left: var(--s-1); right: var(--s-1); bottom: var(--s-1); width: auto; padding: var(--s-2); }
-  .footer-grid { gap: var(--s-4) var(--calha); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--calha); }
   .site-footer { margin-top: var(--s-6); }
 }
 

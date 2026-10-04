@@ -131,7 +131,7 @@ final class PedidoMail
     /** @param array<string, mixed> $pedido */
     private static function totais(array $pedido): string
     {
-        $rotulo = self::soDigital($pedido) ? 'Acesso digital' : ('Envio · ' . frete()['nome']);
+        $rotulo = self::soDigital($pedido) ? 'Acesso digital' : ((float) ($pedido['frete'] ?? 0) <= 0 ? 'Frete grátis' : 'Envio · ' . frete()['nome']);
         return '<p style="margin:0 0 6px;font-size:14px;color:#5C6B61">' . e($rotulo) . ' · ' . e(money($pedido['frete'] ?? 0)) . '</p>'
             . '<p style="margin:0 0 22px;font-size:20px;font-family:Georgia,serif;color:#1B4332">Total ' . e(money($pedido['total'] ?? 0)) . '</p>';
     }

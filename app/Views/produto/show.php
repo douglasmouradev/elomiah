@@ -14,7 +14,7 @@ $colecao = (string) ($produto['colecao'] ?? $produto['categoria_nome'] ?? '');
 <article class="container product-page" data-nevoa-base="<?= e($cor) ?>" style="--c:<?= e($cor) ?>">
     <div class="gallery">
         <div class="gallery-main" tabindex="0" role="button" aria-label="Ampliar foto">
-            <img src="<?= e(asset($principal['caminho'])) ?>" alt="<?= e($principal['alt'] ?? ('Frasco ' . $produto['nome'])) ?>" width="800" height="1000" fetchpriority="high" decoding="async">
+            <img class="vt-frasco" style="view-transition-name:frasco-<?= (int) $produto['id'] ?>" src="<?= e(asset($principal['caminho'])) ?>" alt="<?= e($principal['alt'] ?? ('Frasco ' . $produto['nome'])) ?>" width="800" height="1000" fetchpriority="high" decoding="async">
         </div>
         <?php if (count($imagens) > 1): ?>
             <div class="thumbs">
@@ -63,7 +63,7 @@ $colecao = (string) ($produto['colecao'] ?? $produto['categoria_nome'] ?? '');
             </form>
             <ul class="product-assurance">
                 <li>Sai do ateliê em até 3 dias úteis</li>
-                <li>Pix ou cartão · troca em 7 dias</li>
+                <li><?= e(formas_pagamento()) ?> · troca em 7 dias</li>
                 <?php if ($estoque <= 5): ?><li>Restam <?= $estoque ?> unidades deste lote</li><?php endif; ?>
             </ul>
         <?php elseif ($compraTipo === 'carrinho'): ?>

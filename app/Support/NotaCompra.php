@@ -126,7 +126,7 @@ final class NotaCompra
     /** @param array<string, mixed> $pedido */
     private static function totais(array $pedido, bool $digital): string
     {
-        $envio = $digital ? 'Acesso digital' : ('Envio · ' . frete()['nome']);
+        $envio = $digital ? 'Acesso digital' : ((float) ($pedido['frete'] ?? 0) <= 0 ? 'Frete grátis' : 'Envio · ' . frete()['nome']);
 
         return '<p style="margin:0 0 4px;font-size:14px;color:#5C6B61">Subtotal ' . e(money($pedido['subtotal'] ?? 0)) . '</p>'
             . '<p style="margin:0 0 8px;font-size:14px;color:#5C6B61">' . e($envio) . ' · ' . e(money($pedido['frete'] ?? 0)) . '</p>'

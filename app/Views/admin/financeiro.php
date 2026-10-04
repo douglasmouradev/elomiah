@@ -83,3 +83,25 @@ $temPublica = !empty($temPublica);
         <button class="btn btn-gold" type="submit">Guardar despacho</button>
     </p>
 </form>
+
+<h2 style="margin-top:2.4rem">Vitrine da loja</h2>
+<?php $vitrine = $vitrine ?? ['frete_gratis' => 0, 'avisos' => [], 'atendimento' => '']; ?>
+<p class="field-hint">Cada item só aparece no site depois de preenchido. Deixe em branco para esconder.</p>
+<form class="form" method="post" action="<?= e(url('/admin/vitrine')) ?>" style="max-width:560px">
+    <?= csrf_field() ?>
+    <label><span>Frete grátis acima de (R$)</span>
+        <input type="text" name="frete_gratis_acima" inputmode="decimal" value="<?= $vitrine['frete_gratis'] > 0 ? e(number_format((float) $vitrine['frete_gratis'], 2, ',', '')) : '' ?>" placeholder="Ex.: 250,00 — vazio desliga">
+    </label>
+    <p class="field-hint">Com valor, a sacola mostra quanto falta e o checkout zera o despacho ao atingir.</p>
+    <label><span>Avisos da faixa do topo (um por linha, até 3)</span>
+        <textarea name="faixa_avisos" rows="3" placeholder="Ex.: Lote de outubro disponível"><?= e(implode("\n", $vitrine['avisos'])) ?></textarea>
+    </label>
+    <p class="field-hint">Com frete grátis ligado, o aviso do frete entra sozinho na faixa.</p>
+    <label><span>Horário de atendimento</span>
+        <input type="text" name="atendimento_horario" value="<?= e((string) $vitrine['atendimento']) ?>" maxlength="120" placeholder="Ex.: Seg a sex, 9h às 18h">
+    </label>
+    <p class="field-hint">Razão social e CNPJ do rodapé vêm do bloco “Emitente do recibo”. O CNPJ só aparece se estiver preenchido.</p>
+    <p>
+        <button class="btn btn-gold" type="submit">Guardar vitrine</button>
+    </p>
+</form>

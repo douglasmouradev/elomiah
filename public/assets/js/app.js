@@ -7,6 +7,47 @@
   const caminho = location.pathname.replace(new URL(base || location.origin).pathname.replace(/\/$/, ''), '') || '/';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  /* Abertura: some sozinha; clique ou tecla adianta */
+  const abertura = $('.abertura');
+  if (abertura && document.documentElement.classList.contains('com-abertura')) {
+    const pular = () => abertura.classList.add('is-fora');
+    abertura.addEventListener('click', pular);
+    document.addEventListener('keydown', pular, { once: true });
+    abertura.addEventListener('animationend', (e) => {
+      if (e.target === abertura) abertura.remove();
+    });
+  } else {
+    abertura?.remove();
+  }
+
+  /* Frasco que acompanha a navegação até a página do produto */
+  window.addEventListener('pageswap', (e) => {
+    if (!e.viewTransition || !e.activation?.entry?.url) return;
+    $$('.vt-frasco[data-vt]').forEach((img) => { img.style.viewTransitionName = ''; });
+    const destino = new URL(e.activation.entry.url).pathname;
+    if (!destino.includes('/produto/')) return;
+    const bloco = $$('.product-card, .shelf-item, .elo-row').find((b) =>
+      $$('a[href]', b).some((a) => new URL(a.href).pathname === destino));
+    const img = bloco && $('.vt-frasco[data-vt]', bloco);
+    if (img) img.style.viewTransitionName = img.dataset.vt;
+  });
+
+  /* Faixa de avisos */
+  const faixa = $('[data-faixa]');
+  const avisos = faixa ? $$('li', faixa) : [];
+  if (avisos.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let atual = 0;
+    let parado = false;
+    faixa.addEventListener('mouseenter', () => { parado = true; });
+    faixa.addEventListener('mouseleave', () => { parado = false; });
+    setInterval(() => {
+      if (parado || document.hidden) return;
+      avisos[atual].classList.remove('is-on');
+      atual = (atual + 1) % avisos.length;
+      avisos[atual].classList.add('is-on');
+    }, 5000);
+  }
+
   /* Topo */
   const header = $('.site-header');
   const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
@@ -80,7 +121,7 @@
   const fotoPrincipal = $('.gallery-main img');
   if (galeria && fotoPrincipal) {
     const mover = (e) => {
-      const r = galeria.getBoundingClientRect();
+      const r = fotoPrincipal.getBoundingClientRect();
       galeria.style.setProperty('--zx', `${((e.clientX - r.left) / r.width) * 100}%`);
       galeria.style.setProperty('--zy', `${((e.clientY - r.top) / r.height) * 100}%`);
     };
@@ -194,6 +235,15 @@
     return json;
   };
 
+  let pctAnterior = 0;
+  const barraFrete = (fg) => {
+    if (!fg || !fg.ativo) return '';
+    const texto = fg.atingido
+      ? 'Você ganhou <strong>frete grátis</strong>.'
+      : `Faltam <strong>${esc(fg.falta)}</strong> para o frete grátis.`;
+    return `<div class="frete-gratis${fg.atingido ? ' is-ok' : ''}" role="status"><p>${texto}</p><span class="frete-barra" aria-hidden="true"><i style="--pct:${pctAnterior}" data-pct="${Number(fg.pct) || 0}"></i></span></div>`;
+  };
+
   const desenhar = (estado) => {
     if (!corpo || !rodape) return;
     atualizarContador(estado.count ?? 0);
@@ -220,7 +270,7 @@
         <span class="cart-sub">${esc(i.subtotal)}</span>
       </li>`).join('')}</ul>`;
     rodape.hidden = false;
-    rodape.innerHTML = `
+    rodape.innerHTML = `${barraFrete(estado.freteGratis)}
       <dl class="totals">
         <div><dt>Aromas</dt><dd>${esc(estado.pecas)}</dd></div>
         <div><dt>${esc(estado.frete.nome)}</dt><dd>${esc(estado.frete.valor)}</dd></div>
@@ -228,6 +278,11 @@
       </dl>
       <a class="btn btn-gold" href="${esc(base)}/checkout">${estado.logado ? 'Finalizar compra' : 'Entrar e finalizar'}</a>
       <a class="btn btn-ghost" href="${esc(base)}/carrinho">Ver sacola completa</a>`;
+    const barra = rodape.querySelector('.frete-barra i');
+    if (barra) {
+      requestAnimationFrame(() => requestAnimationFrame(() => { barra.style.setProperty('--pct', barra.dataset.pct); }));
+      pctAnterior = barra.dataset.pct;
+    }
   };
 
   const mostrarAviso = (texto, erro = false) => {
