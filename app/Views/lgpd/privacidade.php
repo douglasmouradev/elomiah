@@ -23,7 +23,7 @@
     <p>Acesso, correção, portabilidade, eliminação, informação sobre compartilhamentos e revogação de consentimento. Exercício em <a href="<?= e(url('/meus-dados')) ?>">Seus dados</a>.</p>
     <h2>Newsletter</h2>
     <p>Se você se inscrever na newsletter, guardamos o e-mail, a data e o registro do aceite, só para mandar novidades da Elomiah. Para sair da lista, peça pela página <a href="<?= e(url('/meus-dados')) ?>">Seus dados</a> ou pelo <a href="<?= e(url('/contato')) ?>">contato</a>.</p>
-    <h2>Cookies</h2>
+    <h2 id="cookies">Cookies</h2>
     <p>Essenciais: sessão, CSRF, sacola. Não essenciais: métricas de visita, gravadas só se você tocar em Aceitar. “Só o essencial” e “Recusar” não geram esse rastreio.</p>
     <h2>Segurança</h2>
     <p>Senhas com hash (Argon2id/bcrypt). Sessões httponly, SameSite=Strict e Secure em produção. Prepared statements PDO. HTTPS obrigatório em produção.</p>

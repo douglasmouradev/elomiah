@@ -1,5 +1,5 @@
 <?php
-$v = '12';
+$v = '13';
 $logado = \App\Core\Auth::check();
 $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
 $vitrine = \App\Models\Configuracao::vitrine();
@@ -198,7 +198,7 @@ $cartao = \App\Support\MercadoPago::configurado();
     </div>
     <div class="container footer-bottom">
         <span>© <?= date('Y') ?> <?= e($loja['razao']) ?><?php if ($loja['cnpj'] !== ''): ?> · CNPJ <?= e($loja['cnpj']) ?><?php endif; ?><?php if ($loja['endereco'] !== ''): ?> · <?= e($loja['endereco']) ?><?php endif; ?></span>
-        <span><a href="<?= e(url('/privacidade')) ?>">Privacidade</a> &nbsp; <a href="<?= e(url('/termos')) ?>">Termos de uso</a></span>
+        <span><a href="<?= e(url('/privacidade')) ?>">Privacidade</a> &nbsp; <a href="<?= e(url('/termos')) ?>">Termos de uso</a> &nbsp; <a href="<?= e(url('/privacidade')) ?>#cookies" data-abrir-cookies>Preferências de cookies</a></span>
     </div>
 </footer>
 

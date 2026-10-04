@@ -224,6 +224,14 @@
       } catch (_) {}
     });
   });
+  $$('[data-abrir-cookies]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      if (!banner) return;
+      e.preventDefault();
+      banner.classList.add('is-on');
+      $('[data-cookie]', banner)?.focus();
+    });
+  });
 
   /* Névoa de cor */
   const camadas = $$('.nevoa i');
