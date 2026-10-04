@@ -4,35 +4,42 @@ View::partial('partials/flash');
 $produto = $produto ?? [];
 $imagens = $imagens ?: [['caminho' => 'images/frasco-despertar.webp', 'alt' => $produto['nome']]];
 $principal = $imagens[0];
-$cor = $produto['cor_destaque'] ?? '#1B4332';
+$cor = (string) ($produto['cor_destaque'] ?? '#173A2C');
 $estoque = (int) ($produto['estoque'] ?? 0);
 $disponivel = $estoque > 0;
 $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
+$volume = (string) ($produto['volume'] ?? '120 ml');
+$colecao = (string) ($produto['colecao'] ?? $produto['categoria_nome'] ?? '');
 ?>
-<section class="container product-page">
+<article class="container product-page" data-nevoa-base="<?= e($cor) ?>" style="--c:<?= e($cor) ?>">
     <div class="gallery">
-        <div class="gallery-main">
-            <img src="<?= e(asset($principal['caminho'])) ?>" alt="<?= e($principal['alt'] ?? $produto['nome']) ?>">
+        <div class="gallery-main" tabindex="0" role="button" aria-label="Ampliar foto">
+            <img src="<?= e(asset($principal['caminho'])) ?>" alt="<?= e($principal['alt'] ?? ('Frasco ' . $produto['nome'])) ?>" width="800" height="1000" fetchpriority="high" decoding="async">
         </div>
         <?php if (count($imagens) > 1): ?>
             <div class="thumbs">
                 <?php foreach ($imagens as $i => $img): ?>
-                    <button type="button" class="<?= $i === 0 ? 'is-on' : '' ?>" data-thumb="<?= e(asset($img['caminho'])) ?>">
-                        <img src="<?= e(asset($img['caminho'])) ?>" alt="">
+                    <button type="button" class="<?= $i === 0 ? 'is-on' : '' ?>" aria-pressed="<?= $i === 0 ? 'true' : 'false' ?>" aria-label="Foto <?= $i + 1 ?> de <?= count($imagens) ?>" data-thumb="<?= e(asset($img['caminho'])) ?>">
+                        <img src="<?= e(asset($img['caminho'])) ?>" alt="" width="72" height="90" loading="lazy">
                     </button>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </div>
-    <div>
-        <p class="eyebrow"><?= e($produto['colecao'] ?? $produto['categoria_nome'] ?? '') ?></p>
-        <p class="product-band" style="background:<?= e((string) $cor) ?>"><?= e($produto['nome']) ?></p>
-        <?php if (!empty($produto['aroma'])): ?>
-            <p class="product-aroma">Aroma <?= e($produto['aroma']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($produto['citacao'])): ?>
-            <p class="lede">“<?= e($produto['citacao']) ?>”</p>
-        <?php endif; ?>
+
+    <div class="product-summary">
+        <nav aria-label="Você está em">
+            <ol class="breadcrumb">
+                <li><a href="<?= e(url('/loja')) ?>">Aromas</a></li>
+                <?php if (!empty($produto['categoria_slug'])): ?>
+                    <li><a href="<?= e(url('/loja?categoria=' . $produto['categoria_slug'])) ?>"><?= e($colecao) ?></a></li>
+                <?php endif; ?>
+                <li aria-current="page"><?= e($produto['nome']) ?></li>
+            </ol>
+        </nav>
+        <h1 class="rotulo"><?= e($produto['nome']) ?></h1>
+        <p class="product-line"><?= !empty($produto['aroma']) ? 'Aroma ' . e(mb_strtolower((string) $produto['aroma'])) . ', ' : '' ?>spray de ambiente, <?= e($volume) ?></p>
+
         <p class="price price-lg">
             <?php if (!empty($produto['preco_promocional'])): ?>
                 <?= e(money($produto['preco_promocional'])) ?>
@@ -41,35 +48,28 @@ $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
                 <?= e(money($produto['preco'])) ?>
             <?php endif; ?>
         </p>
-        <p class="product-stock <?= $disponivel ? 'is-on' : 'is-off' ?>">
-            <?= $disponivel ? 'Disponível · envio em até 3 dias úteis' : 'Esgotado neste momento' ?>
-        </p>
-        <p><?= nl2br(e($produto['descricao'] ?? '')) ?></p>
-
-        <div class="notes">
-            <div class="note"><small>Notas de saída</small><p><?= e($produto['notas_topo'] ?? '—') ?></p></div>
-            <div class="note"><small>Notas de corpo</small><p><?= e($produto['notas_coracao'] ?? '—') ?></p></div>
-            <div class="note"><small>Notas de fundo</small><p><?= e($produto['notas_fundo'] ?? '—') ?></p></div>
-        </div>
-
-        <ul class="facts">
-            <li>Vidro · <?= e($produto['volume'] ?? '120 ml') ?></li>
-            <li>Atomizador dourado</li>
-            <li>Névoa em leque fino</li>
-        </ul>
 
         <?php if ($compraTipo === 'carrinho' && $disponivel): ?>
-            <form method="post" action="<?= e(url('/carrinho/adicionar')) ?>" class="form buy-form">
+            <form method="post" action="<?= e(url('/carrinho/adicionar')) ?>" class="buy-form">
                 <?= csrf_field() ?>
                 <input type="hidden" name="produto_id" value="<?= (int) $produto['id'] ?>">
-                <label><span>Quantidade</span>
-                    <input type="number" name="quantidade" value="1" min="1" max="<?= min(20, max(1, $estoque)) ?>">
-                </label>
+                <div class="stepper" data-stepper>
+                    <button type="button" data-passo="-1" aria-label="Diminuir quantidade">−</button>
+                    <label class="visually-hidden" for="qtd">Quantidade</label>
+                    <input id="qtd" type="number" name="quantidade" value="1" min="1" max="<?= min(20, max(1, $estoque)) ?>" inputmode="numeric">
+                    <button type="button" data-passo="1" aria-label="Aumentar quantidade">+</button>
+                </div>
                 <button class="btn btn-gold" type="submit">Adicionar à sacola</button>
             </form>
+            <ul class="product-assurance">
+                <li>Sai do ateliê em até 3 dias úteis</li>
+                <li>Pix ou cartão · troca em 7 dias</li>
+                <?php if ($estoque <= 5): ?><li>Restam <?= $estoque ?> unidades deste lote</li><?php endif; ?>
+            </ul>
         <?php elseif ($compraTipo === 'carrinho'): ?>
-            <p class="pay-safe">Avise-nos pelo WhatsApp quando quiser ser avisada do retorno.</p>
-            <a class="btn btn-ghost" href="<?= e(whatsapp_url('Olá, quero ser avisada quando ' . ($produto['nome'] ?? 'este aroma') . ' voltar.')) ?>" target="_blank" rel="noopener">Conversar</a>
+            <p class="product-stock is-off">Esgotado neste lote.</p>
+            <p>Mande uma mensagem e a Geo avisa você quando o próximo lote ficar pronto.</p>
+            <p><a class="btn btn-gold" href="<?= e(whatsapp_url('Olá! Quero ser avisada quando ' . ($produto['nome'] ?? 'este aroma') . ' voltar.')) ?>" target="_blank" rel="noopener">Avise-me pelo WhatsApp</a></p>
         <?php else: ?>
             <?php
             $urlCompra = match ($compraTipo) {
@@ -84,42 +84,53 @@ $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
             };
             ?>
             <?php if ($urlCompra): ?>
-                <a class="btn btn-gold" href="<?= e($urlCompra) ?>" target="_blank" rel="noopener"><?= e($rotulo) ?></a>
+                <p><a class="btn btn-gold" href="<?= e($urlCompra) ?>" target="_blank" rel="noopener"><?= e($rotulo) ?></a></p>
             <?php endif; ?>
         <?php endif; ?>
 
-        <div class="ritual">
-            <p class="eyebrow">O ritual</p>
-            <ol>
-                <li>Três névoas no ar, em leque.</li>
-                <li>Deixe assentar no cômodo.</li>
-                <li>Habite o espaço com o olfato acordado.</li>
-            </ol>
-            <?php if (!empty($produto['modo_usar'])): ?>
-                <p><?= e($produto['modo_usar']) ?></p>
-            <?php endif; ?>
+        <div class="notes">
+            <div class="note"><small>Saída</small><p><?= e($produto['notas_topo'] ?: '—') ?></p></div>
+            <div class="note"><small>Corpo</small><p><?= e($produto['notas_coracao'] ?: '—') ?></p></div>
+            <div class="note"><small>Fundo</small><p><?= e($produto['notas_fundo'] ?: '—') ?></p></div>
         </div>
 
-        <div class="tech">
-            <p><strong>Spray de ambiente</strong> · <?= e($produto['volume'] ?? '120 ml') ?></p>
-            <?php if (!empty($produto['precaucoes'])): ?>
-                <p><strong>Precauções.</strong> <?= e($produto['precaucoes']) ?></p>
-            <?php endif; ?>
-            <p><?= nl2br(e($produto['ficha_tecnica'] ?? '')) ?></p>
-        </div>
+        <?php if (!empty($produto['citacao'])): ?>
+            <p class="product-quote">“<?= e($produto['citacao']) ?>”</p>
+        <?php endif; ?>
+        <?php if (!empty($produto['descricao'])): ?>
+            <div class="product-desc"><p><?= nl2br(e($produto['descricao'])) ?></p></div>
+        <?php endif; ?>
+
+        <details class="accordion">
+            <summary>Como usar</summary>
+            <div class="accordion-body">
+                <p><?= e($produto['modo_usar'] ?: 'Borrife no ambiente, a cerca de 20 cm, e espere o aroma assentar.') ?></p>
+            </div>
+        </details>
+        <details class="accordion">
+            <summary>Ficha e cuidados</summary>
+            <div class="accordion-body">
+                <p>Frasco de vidro com atomizador dourado, <?= e($volume) ?>.</p>
+                <?php if (!empty($produto['ficha_tecnica'])): ?>
+                    <p><?= nl2br(e($produto['ficha_tecnica'])) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($produto['precaucoes'])): ?>
+                    <p><strong>Cuidados:</strong> <?= e($produto['precaucoes']) ?></p>
+                <?php endif; ?>
+            </div>
+        </details>
     </div>
-</section>
+</article>
 
 <?php if (!empty($depoimentos)): ?>
 <section class="container">
-    <h2>Quem escolheu este aroma</h2>
-    <div class="quotes">
+    <h2>Quem usa o <?= e($produto['nome']) ?></h2>
+    <div class="quotes" style="--c:<?= e($cor) ?>">
         <?php foreach ($depoimentos as $d): ?>
-            <blockquote class="quote">
-                <div class="stars"><?= str_repeat('★', (int) $d['nota']) ?></div>
-                <p>“<?= e($d['texto']) ?>”</p>
-                <footer><?= e($d['nome']) ?></footer>
-            </blockquote>
+            <figure class="quote">
+                <blockquote><p>“<?= e($d['texto']) ?>”</p></blockquote>
+                <figcaption><strong><?= e($d['nome']) ?></strong></figcaption>
+            </figure>
         <?php endforeach; ?>
     </div>
 </section>
@@ -127,7 +138,7 @@ $compraTipo = $produto['compra_tipo'] ?? 'carrinho';
 
 <?php if (!empty($relacionados)): ?>
 <section class="container">
-    <div class="section-head"><p class="eyebrow">Continuar</p><h2>Na mesma coleção</h2></div>
+    <div class="section-head"><h2>Outros aromas da <?= e($colecao) ?></h2></div>
     <div class="product-grid">
         <?php foreach ($relacionados as $p): View::partial('partials/product-card', ['p' => $p]); endforeach; ?>
     </div>

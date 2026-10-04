@@ -8,9 +8,8 @@ $requerEnvio = $requerEnvio ?? carrinho_requer_envio($carrinho);
 $freteInfo = $freteInfo ?? frete();
 ?>
 <section class="page-hero container">
-    <p class="eyebrow">Fechamento</p>
-    <h1>Checkout</h1>
-    <p class="lede lede-center"><?= $requerEnvio ? 'A compra fica nesta conta. Depois você acompanha o envio e o rastreio em Pedidos.' : 'A matrícula fica nesta conta. O acesso libera aqui depois do pagamento.' ?></p>
+    <h1>Finalizar compra</h1>
+    <p class="lede"><?= $requerEnvio ? 'Dois passos: para onde enviar e como pagar. Depois você acompanha o envio em Minha conta.' : 'Dois passos: seus dados e o pagamento. O acesso ao curso libera nesta conta.' ?></p>
 </section>
 <section class="container checkout-layout">
     <form class="form" method="post" action="<?= e(url('/checkout')) ?>" data-checkout>
@@ -29,7 +28,7 @@ $freteInfo = $freteInfo ?? frete();
             <?php if ($requerEnvio): ?>
             <h2 class="form-block">Endereço</h2>
             <?php if ($endereco): ?>
-                <p class="field-hint">Preenchemos com o último destino desta conta. Altere se o envio for para outro lugar.</p>
+                <p class="field-hint">Preenchemos com o último endereço desta conta. Altere se o envio for para outro lugar.</p>
             <?php endif; ?>
             <label><span>CEP</span>
                 <input type="text" name="cep" id="cep" maxlength="9" value="<?= e((string) old('cep', cep_format($endereco['cep'] ?? ''))) ?>" required autocomplete="postal-code">
@@ -65,20 +64,20 @@ $freteInfo = $freteInfo ?? frete();
                 <label class="pay-option">
                     <input type="radio" name="metodo_pagamento" value="pix" <?= $metodo !== 'cartao' ? 'checked' : '' ?>>
                     <span class="pay-option-title">Pix</span>
-                    <span class="pay-option-hint">QR nesta página</span>
+                    <span class="pay-option-hint">QR Code na próxima tela</span>
                 </label>
                 <label class="pay-option">
                     <input type="radio" name="metodo_pagamento" value="cartao" <?= $metodo === 'cartao' ? 'checked' : '' ?><?= empty($mpPronto) ? ' disabled' : '' ?>>
                     <span class="pay-option-title">Cartão de crédito</span>
-                    <span class="pay-option-hint"><?= !empty($mpPronto) ? 'Visa, Mastercard, Elo' : 'Liga no ateliê com o Mercado Pago' ?></span>
+                    <span class="pay-option-hint"><?= !empty($mpPronto) ? 'Visa, Mastercard, Elo · até 6x' : 'Indisponível no momento' ?></span>
                 </label>
             </div>
-            <p class="pay-safe"><?= !empty($mpPronto) ? 'Pix e cartão confirmam aqui. O número do cartão não fica no site.' : 'Pix confirma nesta página, na chave da Elomiah.' ?></p>
+            <p class="pay-safe"><?= !empty($mpPronto) ? 'O número do cartão vai direto ao Mercado Pago e não fica salvo no site.' : 'O Pix é pago na chave da Elomiah e confirmado na tela do pedido.' ?></p>
             <label class="check">
                 <input type="checkbox" name="lgpd" value="1" required>
                 <span>Li e aceito a <a href="<?= e(url('/privacidade')) ?>" target="_blank">Política de Privacidade</a> e os <a href="<?= e(url('/termos')) ?>" target="_blank">Termos de Uso</a>. Autorizo o uso dos meus dados para processar este pedido.</span>
             </label>
-            <button class="btn btn-gold" type="submit">Pagar agora</button>
+            <button class="btn btn-gold" type="submit">Confirmar pedido e pagar</button>
         </div>
     </form>
     <aside class="checkout-summary">
@@ -86,7 +85,7 @@ $freteInfo = $freteInfo ?? frete();
         <ul>
             <?php foreach ($carrinho['items'] as $item): $p = $item['produto']; ?>
                 <li>
-                    <img src="<?= e(asset($p['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="">
+                    <img src="<?= e(asset($p['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="" width="52" height="65">
                     <span>
                         <?= e($p['nome']) ?> × <?= (int) $item['qty'] ?>
                         <small><?= e(money($item['subtotal'])) ?></small>
@@ -94,10 +93,12 @@ $freteInfo = $freteInfo ?? frete();
                 </li>
             <?php endforeach; ?>
         </ul>
-        <p>Subtotal <?= e(money($carrinho['total'])) ?></p>
-        <p><?= e($freteInfo['nome']) ?> <?= e(money($freteInfo['valor'])) ?></p>
+        <dl class="totals">
+            <div><dt>Subtotal</dt><dd><?= e(money($carrinho['total'])) ?></dd></div>
+            <div><dt><?= e($freteInfo['nome']) ?></dt><dd><?= e(money($freteInfo['valor'])) ?></dd></div>
+            <div class="totals-total"><dt>Total</dt><dd><?= e(money($total ?? 0)) ?></dd></div>
+        </dl>
         <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
-        <p class="price price-lg">Total <?= e(money($total ?? 0)) ?></p>
-        <p class="field-hint">Pix · Cartão · dados protegidos</p>
+        <p class="field-hint">Pix ou cartão · troca em 7 dias.</p>
     </aside>
 </section>

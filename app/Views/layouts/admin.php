@@ -8,7 +8,7 @@
     <title><?= e($title ?? 'Ateliê Elomiah') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('css/admin-base.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>

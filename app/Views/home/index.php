@@ -3,104 +3,109 @@ use App\Core\View;
 $produtos = $produtos ?? [];
 $depoimentos = $depoimentos ?? [];
 $curso = $curso ?? null;
-$depoimentosHome = array_slice($depoimentos, 0, 3);
-$depoimentoDestaque = $depoimentosHome[0] ?? null;
-$depoimentosApoio = array_slice($depoimentosHome, 1);
+$refugio = array_values(array_filter($produtos, static fn ($p) => ($p['categoria_slug'] ?? '') === 'colecao-refugio'));
+$elo = array_values(array_filter($produtos, static fn ($p) => ($p['categoria_slug'] ?? '') === 'colecao-elo'))[0] ?? null;
+if (!$refugio) {
+    $refugio = array_slice($produtos, 0, 5);
+}
+usort($refugio, static fn ($a, $b) => (int) $a['id'] <=> (int) $b['id']);
+$porId = [];
+foreach ($produtos as $p) {
+    $porId[(int) $p['id']] = $p;
+}
+$depoimento = null;
+foreach ($depoimentos as $d) {
+    if (!empty($d['produto_id']) && isset($porId[(int) $d['produto_id']])) {
+        $depoimento = $d;
+        break;
+    }
+}
+$depoimento ??= $depoimentos[0] ?? null;
+$aromaDepoimento = $depoimento ? ($porId[(int) ($depoimento['produto_id'] ?? 0)] ?? null) : null;
 View::partial('partials/flash');
 ?>
-<section class="hero container">
-    <div class="hero-copy" data-parallax="0.08" data-dir="up">
-        <p class="eyebrow">Coleção Refúgio</p>
-        <h1 class="display">Elomiah</h1>
-        <p class="hero-slogan"><i></i><span>Onde o sagrado encontra a essência.</span><i></i></p>
-        <p class="lede">Cinco névoas em vidro — Despertar, Recomeço, Encontro, Equilíbrio e Silêncio.</p>
-        <div class="hero-actions">
-            <a class="btn btn-gold" href="<?= e(url('/loja')) ?>">A coleção</a>
-            <a class="btn btn-ghost" href="<?= e(url('/sobre')) ?>">A história</a>
-        </div>
-    </div>
-    <div class="hero-visual">
-        <div class="gold-ring" data-parallax="0.05"></div>
-        <img class="spray" data-spray src="<?= e(asset('images/frasco-despertar.webp')) ?>" alt="Spray Elomiah Despertar, aroma manga verde" fetchpriority="high">
-        <canvas class="hero-mist" id="mist-canvas"></canvas>
-    </div>
-</section>
-
-<section class="collection-band">
-    <figure class="container">
-        <img src="<?= e(asset('images/colecao-refugio.webp')) ?>" alt="Coleção Refúgio Elomiah — cinco sprays de ambiente" loading="lazy">
-        <figcaption>Cinco névoas · 120 ml · vidro</figcaption>
-    </figure>
-</section>
-
-<section>
-    <div class="container story story-text">
+<section class="shelf container" aria-labelledby="titulo-home">
+    <div class="shelf-head">
+        <h1 class="display" id="titulo-home">Onde o sagrado encontra a essência.</h1>
         <div>
-            <p class="eyebrow">A marca</p>
-            <h2>Um refúgio, não uma vitrine.</h2>
-            <p>A Elomiah nasceu da insistência da Geo em tratar o cheiro como território. Não como tendência. Como o gesto de consagrar um cômodo antes de viver nele.</p>
-            <p>Os frascos são de vidro. O spray sai em leque fino. Cada nome — Despertar, Recomeço, Encontro, Equilíbrio, Silêncio — é um estado, não um slogan de prateleira.</p>
-            <div class="story-note">GEO · COLEÇÃO REFÚGIO · 120 ML</div>
-            <p class="story-cta"><a class="btn btn-ghost" href="<?= e(url('/sobre')) ?>">Conhecer a Geo</a></p>
+            <p class="shelf-sub">Cinco sprays de ambiente em vidro, 120 ml. Cada um com um aroma e um momento do dia.</p>
+            <a class="btn btn-gold" href="<?= e(url('/loja')) ?>">Ver os aromas</a>
         </div>
     </div>
+    <ul class="shelf-row">
+        <?php foreach ($refugio as $i => $p): $cor = (string) ($p['cor_destaque'] ?? '#173A2C'); ?>
+            <li class="shelf-item" style="--c:<?= e($cor) ?>" data-nevoa="<?= e($cor) ?>">
+                <a href="<?= e(url('/produto/' . $p['slug'])) ?>">
+                    <span class="shelf-photo">
+                        <img src="<?= e(asset($p['imagem'] ?? 'images/frasco-despertar.webp')) ?>" alt="" width="250" height="450" <?= $i < 3 ? 'fetchpriority="high"' : 'loading="lazy"' ?> decoding="async">
+                    </span>
+                    <span class="shelf-name rotulo"><?= e($p['nome']) ?></span>
+                    <span class="shelf-aroma"><?= e($p['aroma'] ?? '') ?></span>
+                    <span class="shelf-aroma price"><?= e(money($p['preco_promocional'] ?: $p['preco'])) ?></span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
 </section>
 
-<section>
-    <div class="container">
-        <div class="section-head">
-            <p class="eyebrow">A vitrine</p>
-            <h2>Coleção Refúgio</h2>
-            <p class="lede lede-center">Cinco aromas, um mesmo ritual. Mais o Elo, para os primeiros capítulos.</p>
+<?php if ($elo): $corElo = (string) ($elo['cor_destaque'] ?? '#C9A24B'); ?>
+<section class="container">
+    <div class="elo-row" data-nevoa="<?= e($corElo) ?>">
+        <figure>
+            <img src="<?= e(asset($elo['imagem'] ?? 'images/frasco-elo.webp')) ?>" alt="Frasco do Elo, spray de algodão e camomila" width="400" height="500" loading="lazy" decoding="async">
+        </figure>
+        <div>
+            <p class="eyebrow">Coleção Elo</p>
+            <h2>Elo, para o quarto do bebê</h2>
+            <p class="lede">Lavanda e bergamota na saída, algodão e camomila no corpo, musk e sândalo no fundo. Borrife no ar ou em tecidos, a 20 cm, e o quarto fica com cheiro de roupa limpa.</p>
+            <p><a class="btn btn-ghost" href="<?= e(url('/produto/' . $elo['slug'])) ?>">Conhecer o Elo, <?= e(money($elo['preco_promocional'] ?: $elo['preco'])) ?></a></p>
         </div>
-        <div class="product-grid">
-            <?php foreach ($produtos as $p): ?>
-                <?php View::partial('partials/product-card', ['p' => $p]); ?>
-            <?php endforeach; ?>
-        </div>
-        <p class="section-cta"><a class="btn btn-ghost" href="<?= e(url('/loja')) ?>">Ver a coleção</a></p>
-    </div>
-</section>
-
-<?php if ($depoimentoDestaque): ?>
-<section>
-    <div class="container">
-        <div class="section-head">
-            <p class="eyebrow">Quem viveu o ritual</p>
-            <h2>Depoimentos</h2>
-        </div>
-        <div class="quotes-editorial">
-            <blockquote class="quote quote-lead">
-                <div class="stars"><?= str_repeat('★', (int) $depoimentoDestaque['nota']) ?></div>
-                <p>“<?= e($depoimentoDestaque['texto']) ?>”</p>
-                <footer><?= e($depoimentoDestaque['nome']) ?></footer>
-            </blockquote>
-            <?php if ($depoimentosApoio): ?>
-                <div class="quotes-side">
-                    <?php foreach ($depoimentosApoio as $d): ?>
-                        <blockquote class="quote">
-                            <div class="stars"><?= str_repeat('★', (int) $d['nota']) ?></div>
-                            <p>“<?= e($d['texto']) ?>”</p>
-                            <footer><?= e($d['nome']) ?></footer>
-                        </blockquote>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-        <p class="section-cta"><a class="btn btn-ghost" href="<?= e(url('/depoimentos')) ?>">Ler todos</a></p>
     </div>
 </section>
 <?php endif; ?>
 
-<section class="course-wrap">
+<section class="container">
+    <div class="geo">
+        <figure>
+            <img src="<?= e(asset('images/geo-fundadora.webp')) ?>" alt="Geo, fundadora da Elomiah, no ateliê" width="1536" height="1024" loading="lazy" decoding="async">
+            <figcaption>Geo, fundadora da Elomiah.</figcaption>
+        </figure>
+        <div>
+            <h2>Quem faz: a Geo</h2>
+            <p class="lede">Antes de virar frasco, cada aroma passa semanas em teste no linho, na madeira e na pele.</p>
+            <p>A Geo formula cada aroma em pequenos lotes. É também ela quem conduz o curso O Ritual das Essências.</p>
+            <p><a class="btn btn-ghost" href="<?= e(url('/sobre')) ?>">A história da marca</a></p>
+        </div>
+    </div>
+</section>
+
+<?php if ($depoimento): ?>
+<section class="container">
+    <figure class="testimonial" style="--c:<?= e((string) ($aromaDepoimento['cor_destaque'] ?? '#A9853B')) ?>">
+        <blockquote>
+            <p>“<?= e($depoimento['texto']) ?>”</p>
+        </blockquote>
+        <figcaption>
+            <strong><?= e($depoimento['nome']) ?></strong><?php if ($aromaDepoimento): ?>, sobre <a href="<?= e(url('/produto/' . $aromaDepoimento['slug'])) ?>"><?= e($aromaDepoimento['nome']) ?></a><?php endif; ?>
+            <br><a href="<?= e(url('/depoimentos')) ?>">Ler os outros relatos</a>
+        </figcaption>
+    </figure>
+</section>
+<?php endif; ?>
+
+<section class="container">
     <div class="course-band">
         <div class="copy">
-            <p class="eyebrow">Formação</p>
+            <p class="eyebrow lede-on-dark">Curso com a Geo</p>
             <h2><?= e($curso['titulo'] ?? 'O Ritual das Essências') ?></h2>
-            <p class="lede lede-on-dark">Seis módulos com a Geo: olfato, casa e o hábito de consagrar o espaço.</p>
-            <p class="course-price"><?= e(money($curso['preco'] ?? 497)) ?></p>
-            <a class="btn btn-gold" href="<?= e(url('/curso')) ?>">Conhecer o curso</a>
+            <ul class="course-facts">
+                <li>6 módulos gravados</li>
+                <li>Acesso por 12 meses</li>
+                <li><?= e(money($curso['preco'] ?? 497)) ?></li>
+            </ul>
+            <p class="lede lede-on-dark">Olfato, composição de ambiente e como criar o seu próprio ritual em casa.</p>
+            <a class="btn btn-gold" href="<?= e(url('/curso')) ?>">Ver o programa</a>
         </div>
-        <img src="<?= e(asset('images/still-sagrado.webp')) ?>" alt="Névoa Elomiah no ateliê" loading="lazy">
+        <img src="<?= e(asset('images/still-sagrado.webp')) ?>" alt="" width="1536" height="1024" loading="lazy" decoding="async">
     </div>
 </section>

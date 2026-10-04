@@ -1,10 +1,9 @@
 <?php \App\Core\View::partial('partials/flash'); ?>
 <section class="page-hero container">
-    <p class="eyebrow">Conta</p>
     <h1>Cadastro</h1>
-    <p class="lede lede-center">Crie a conta para comprar no site e ver status, peças e código de rastreio.</p>
+    <p class="lede">Crie a conta para comprar no site e ver status, peças e código de rastreio.</p>
 </section>
-<section class="container" style="max-width:480px">
+<section class="container narrow">
     <form class="form" method="post" action="<?= e(url('/cadastro')) ?>">
         <?= csrf_field() ?>
         <label><span>Nome</span><input type="text" name="nome" value="<?= e((string) old('nome')) ?>" required></label>

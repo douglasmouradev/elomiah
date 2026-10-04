@@ -13,9 +13,8 @@ $idx = array_search($idxStatus, $ordem, true);
 \App\Core\View::partial('partials/flash');
 ?>
 <section class="page-hero container">
-    <p class="eyebrow">Pedido</p>
     <h1><?= e($pedido['codigo'] ?? '') ?></h1>
-    <p class="lede lede-center"><?= e(pedido_status_rotulo($status, $digital)) ?></p>
+    <p class="lede"><?= e(pedido_status_rotulo($status, $digital)) ?></p>
 </section>
 <section class="container account-page">
     <?php if ($status !== 'cancelado'): ?>
@@ -56,7 +55,7 @@ $idx = array_search($idxStatus, $ordem, true);
         </p>
     <?php elseif (!empty($pedido['codigo_rastreio'])): ?>
         <div class="account-rastreio">
-            <p class="eyebrow">Rastreio</p>
+            <h2>Rastreio</h2>
             <p><?= e($pedido['transportadora'] ?: 'Correios') ?> · <strong><?= e($pedido['codigo_rastreio']) ?></strong></p>
             <?php if ($rastreioLink): ?>
                 <p><a class="btn btn-gold" href="<?= e($rastreioLink) ?>" target="_blank" rel="noopener">Acompanhar nos Correios</a></p>

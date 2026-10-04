@@ -43,6 +43,7 @@ return static function (Router $router): void {
     $router->post('/contato', [ContatoController::class, 'store']);
 
     $router->get('/carrinho', [CarrinhoController::class, 'index']);
+    $router->get('/carrinho/resumo', [CarrinhoController::class, 'resumo']);
     $router->post('/carrinho/adicionar', [CarrinhoController::class, 'add']);
     $router->post('/carrinho/atualizar', [CarrinhoController::class, 'update']);
     $router->post('/carrinho/remover', [CarrinhoController::class, 'remove']);

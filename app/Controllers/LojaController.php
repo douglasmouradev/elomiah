@@ -18,21 +18,36 @@ final class LojaController extends Controller
         if (!in_array($ordenar, ['lancamento', 'preco_asc', 'preco_desc', 'nome'], true)) {
             $ordenar = 'lancamento';
         }
+        $busca = mb_substr(trim((string) $request->input('q', '')), 0, 60);
 
-        $categorias = array_values(array_filter(
-            Categoria::all('ordem ASC'),
-            static fn (array $c): bool => ($c['slug'] ?? '') !== 'formacao'
-        ));
+        $todos = Produto::ativos();
+        $contagem = [];
+        foreach ($todos as $p) {
+            $slug = (string) ($p['categoria_slug'] ?? '');
+            $contagem[$slug] = ($contagem[$slug] ?? 0) + 1;
+        }
+
+        $categorias = [];
+        foreach (Categoria::all('ordem ASC') as $c) {
+            $total = $contagem[$c['slug'] ?? ''] ?? 0;
+            if (($c['slug'] ?? '') !== 'formacao' && $total > 0) {
+                $c['total'] = $total;
+                $categorias[] = $c;
+            }
+        }
 
         $this->view('loja/index', [
-            'title' => 'A loja — Elomiah',
+            'title' => $busca !== '' ? 'Busca: ' . $busca . ' — Elomiah' : 'A loja — Elomiah',
             'categorias' => $categorias,
+            'totalGeral' => count($todos),
             'produtos' => Produto::ativos([
                 'categoria' => $categoria,
                 'ordenar' => $ordenar,
+                'busca' => $busca,
             ]),
             'categoriaAtual' => $categoria,
             'ordenar' => $ordenar,
+            'busca' => $busca,
         ]);
     }
 }

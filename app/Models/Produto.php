@@ -33,6 +33,16 @@ final class Produto extends Model
         if (!empty($filters['destaque'])) {
             $sql .= ' AND p.destaque = 1';
         }
+        $busca = trim((string) ($filters['busca'] ?? ''));
+        if ($busca !== '') {
+            $campos = ['p.nome', 'p.aroma', 'p.notas_topo', 'p.notas_coracao', 'p.notas_fundo', 'p.descricao_curta', 'c.nome'];
+            $partes = [];
+            foreach ($campos as $i => $campo) {
+                $partes[] = $campo . ' LIKE :q' . $i;
+                $params['q' . $i] = '%' . addcslashes($busca, '%_\\') . '%';
+            }
+            $sql .= ' AND (' . implode(' OR ', $partes) . ')';
+        }
 
         $order = match ($filters['ordenar'] ?? 'lancamento') {
             'preco_asc' => 'COALESCE(NULLIF(p.preco_promocional, 0), p.preco) ASC',

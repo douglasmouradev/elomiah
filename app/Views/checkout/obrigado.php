@@ -19,8 +19,8 @@ $cursoUrl = (string) ($cursoUrl ?? '');
 $pagoComAcesso = $pago && $digital;
 ?>
 <section class="page-hero container">
-    <p class="eyebrow"><?= e(pedido_status_rotulo($status, $digital)) ?></p>
-    <h1><?= e($pedido['codigo'] ?? '') ?></h1>
+    <h1>Pedido <?= e($pedido['codigo'] ?? '') ?></h1>
+    <p><span class="status-pill status-<?= e($status) ?>"><?= e(pedido_status_rotulo($status, $digital)) ?></span></p>
 
     <?php if ($status !== 'cancelado'): ?>
         <ol class="order-track">
@@ -43,7 +43,7 @@ $pagoComAcesso = $pago && $digital;
     <?php endif; ?>
 
     <?php if ($pagoComAcesso): ?>
-        <p class="lede" style="margin-inline:auto">Pagamento confirmado. A formação está nesta conta. O recibo foi para o seu e-mail.</p>
+        <p class="lede">Pagamento confirmado. A formação está nesta conta. O recibo foi para o seu e-mail.</p>
         <p>
             <?php if ($cursoUrl !== ''): ?>
                 <a class="btn btn-gold" href="<?= e($cursoUrl) ?>" target="_blank" rel="noopener">Abrir as aulas</a>
@@ -51,25 +51,25 @@ $pagoComAcesso = $pago && $digital;
             <a class="btn btn-ghost" href="<?= e(url('/conta/curso')) ?>">Ver na conta</a>
         </p>
     <?php elseif ($pago && $ehCartao): ?>
-        <p class="lede" style="margin-inline:auto">
+        <p class="lede">
             Cartão <?= e(\App\Support\CartaoCredito::bandeiraRotulo((string) ($pedido['cartao_bandeira'] ?? ''))) ?>
             <?php if (!empty($pedido['cartao_final'])): ?>final <?= e($pedido['cartao_final']) ?><?php endif; ?>
             <?php if (!empty($pedido['parcelas'])): ?> · <?= (int) $pedido['parcelas'] ?>x<?php endif; ?>.
             Confirmação e o recibo de compra foram para <?= e($pedido['email_cliente'] ?? '') ?>.
         </p>
     <?php elseif ($pago): ?>
-        <p class="lede" style="margin-inline:auto">Pix confirmado. O recibo de compra foi para o seu e-mail. O ritual segue para despacho.</p>
+        <p class="lede">Pix confirmado. O recibo de compra foi para o seu e-mail. O pedido sai do ateliê em até 3 dias úteis.</p>
     <?php elseif ($status === 'enviado'): ?>
-        <p class="lede" style="margin-inline:auto">
+        <p class="lede">
             Seu pedido saiu do ateliê<?= !empty($pedido['transportadora']) ? ' pelos ' . e($pedido['transportadora']) : '' ?>.
             <?php if (!empty($pedido['codigo_rastreio'])): ?>
                 Rastreio: <strong><?= e($pedido['codigo_rastreio']) ?></strong>.
             <?php endif; ?>
         </p>
     <?php elseif ($status === 'entregue'): ?>
-        <p class="lede" style="margin-inline:auto">Pedido entregue. Que o cômodo receba bem o cheiro.</p>
+        <p class="lede">Pedido entregue. Se algo não estiver certo, você tem 7 dias para pedir a troca pelo WhatsApp.</p>
     <?php elseif ($pendente && $ehPix && $pixPayload !== ''): ?>
-        <p class="lede" style="margin-inline:auto">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confere na Nubank e marca como pago. Você recebe um e-mail — esta página não confirma sozinha pelo banco.' ?></p>
+        <p class="lede">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confere na Nubank e marca como pago. Você recebe um e-mail — esta página não confirma sozinha pelo banco.' ?></p>
         <div class="pix-box">
             <?php if ($pixQrBase64 !== ''): ?>
                 <img class="pix-qr" src="data:image/png;base64,<?= e($pixQrBase64) ?>" alt="QR Code Pix" width="220" height="220">
@@ -91,15 +91,15 @@ $pagoComAcesso = $pago && $digital;
             <p class="pix-wait" id="pix-wait"><?= $pixAutomatico ? 'Aguardando o Pix…' : 'Aguardando o ateliê confirmar o Pix…' ?></p>
         </div>
     <?php elseif ($pendente && $ehCartao && $cartaoNoSite): ?>
-        <p class="lede" style="margin-inline:auto">Pague <?= e(money($pedido['total'] ?? 0)) ?> no cartão. O número não fica no ateliê.</p>
+        <p class="lede">Pague <?= e(money($pedido['total'] ?? 0)) ?> no cartão. O número do cartão vai direto ao Mercado Pago.</p>
         <div class="card-brick">
             <div id="cardPaymentBrick_container"></div>
             <p class="card-brick-err" id="card-brick-err" hidden></p>
         </div>
     <?php elseif ($pendente): ?>
-        <p class="lede" style="margin-inline:auto">O pedido está reservado. Conclua o <?= e(pagamento_rotulo($metodo)) ?> para confirmar.</p>
+        <p class="lede">O pedido está reservado. Conclua o <?= e(pagamento_rotulo($metodo)) ?> para confirmar.</p>
     <?php else: ?>
-        <p class="lede" style="margin-inline:auto">Este pagamento não foi concluído. Se ainda quiser o pedido, volte à loja e tente outra vez.</p>
+        <p class="lede">Este pagamento não foi concluído. Se ainda quiser o pedido, volte à loja e tente outra vez.</p>
     <?php endif; ?>
 
     <p>Total <?= e(money($pedido['total'] ?? 0)) ?> · <?= e(pagamento_rotulo($metodo)) ?> · <?= e(pedido_status_rotulo($status)) ?></p>
@@ -126,8 +126,8 @@ $pagoComAcesso = $pago && $digital;
       text: payload,
       width: 220,
       height: 220,
-      colorDark: '#1B4332',
-      colorLight: '#FDFBF6',
+      colorDark: '#173A2C',
+      colorLight: '#FBFAF6',
       correctLevel: QRCode.CorrectLevel.M
     });
   }

@@ -1,8 +1,7 @@
 <section class="page-hero container">
-    <p class="eyebrow">LGPD</p>
     <h1>Política de Privacidade</h1>
 </section>
-<section class="container" style="max-width:720px;padding-bottom:5rem">
+<section class="container prose">
     <p>A Elomiah trata dados pessoais de acordo com a Lei nº 13.709/2018 (LGPD). Controladora: Elomiah / Geo, contato via <?= e(url('/contato')) ?> e <?= e(url('/meus-dados')) ?>.</p>
     <h2>Dados que coletamos</h2>
     <ul>

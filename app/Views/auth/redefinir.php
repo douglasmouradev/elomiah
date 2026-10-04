@@ -1,10 +1,9 @@
 <?php \App\Core\View::partial('partials/flash'); $token = $token ?? ''; ?>
 <section class="page-hero container">
-    <p class="eyebrow">Conta</p>
     <h1>Nova senha</h1>
-    <p class="lede lede-center">Escolha uma senha com ao menos oito caracteres.</p>
+    <p class="lede">Escolha uma senha com ao menos oito caracteres.</p>
 </section>
-<section class="container" style="max-width:420px">
+<section class="container narrow-sm">
     <form class="form" method="post" action="<?= e(url('/recuperar-senha/' . $token)) ?>">
         <?= csrf_field() ?>
         <label><span>Nova senha</span><input type="password" name="senha" required minlength="8"></label>

@@ -4,17 +4,16 @@ $usuario = $usuario ?? [];
 $pedidos = $pedidos ?? [];
 ?>
 <section class="page-hero container">
-    <p class="eyebrow">Conta</p>
-    <h1>Seus pedidos</h1>
-    <p class="lede lede-center">Aqui ficam as peças, o andamento e o rastreio quando o ateliê despacha.</p>
+    <h1>Minha conta</h1>
+    <p class="lede">Pedidos, rastreio, endereço e senha.</p>
 </section>
 <section class="container account-page">
     <p class="account-hello">Olá, <?= e((string) ($usuario['nome'] ?? '')) ?>.</p>
 
     <?php if (!empty($cursoAcesso)): ?>
         <article class="account-address">
-            <p class="eyebrow">Formação</p>
-            <p class="lede" style="margin:0 0 1rem">O Ritual das Essências está liberado nesta conta.</p>
+            <h2>Curso O Ritual das Essências</h2>
+            <p class="lede">O Ritual das Essências está liberado nesta conta.</p>
             <?php if (!empty($cursoUrl)): ?>
                 <p><a class="btn btn-gold" href="<?= e((string) $cursoUrl) ?>" target="_blank" rel="noopener">Abrir as aulas</a></p>
             <?php else: ?>
@@ -24,14 +23,14 @@ $pedidos = $pedidos ?? [];
     <?php endif; ?>
 
     <article class="account-address">
-        <p class="eyebrow">Seus dados</p>
+        <h2>Seus dados</h2>
         <form class="form" method="post" action="<?= e(url('/conta/perfil')) ?>">
             <?= csrf_field() ?>
             <label><span>Nome</span><input type="text" name="nome" value="<?= e((string) ($usuario['nome'] ?? '')) ?>" required></label>
             <label><span>Telefone</span><input type="tel" name="telefone" value="<?= e((string) ($usuario['telefone'] ?? '')) ?>" required></label>
             <button class="btn btn-ghost" type="submit">Guardar dados</button>
         </form>
-        <form class="form" method="post" action="<?= e(url('/conta/senha')) ?>" style="margin-top:1.4rem">
+        <form class="form" method="post" action="<?= e(url('/conta/senha')) ?>" style="margin-top:var(--s-3)">
             <?= csrf_field() ?>
             <label><span>Senha atual</span><input type="password" name="senha_atual" required autocomplete="current-password"></label>
             <label><span>Nova senha</span><input type="password" name="senha" required minlength="8" autocomplete="new-password"></label>
@@ -42,7 +41,7 @@ $pedidos = $pedidos ?? [];
 
     <?php $endereco = $endereco ?? null; $freteInfo = frete(); ?>
     <article class="account-address">
-        <p class="eyebrow">Endereço de envio</p>
+        <h2>Endereço de envio</h2>
         <p class="field-hint"><?= e($freteInfo['nome']) ?> · <?= e($freteInfo['prazo']) ?></p>
         <form class="form" method="post" action="<?= e(url('/conta/endereco')) ?>">
             <?= csrf_field() ?>
@@ -66,8 +65,8 @@ $pedidos = $pedidos ?? [];
 
     <?php if (!$pedidos): ?>
         <div class="cart-empty">
-            <p class="lede lede-center">Ainda não há pedidos nesta conta.</p>
-            <p><a class="btn btn-gold" href="<?= e(url('/loja')) ?>">Ir à coleção</a></p>
+            <p>Você ainda não fez pedidos. Quando fizer, o andamento e o código de rastreio aparecem aqui.</p>
+            <p><a class="btn btn-gold" href="<?= e(url('/loja')) ?>">Ver os aromas</a></p>
         </div>
     <?php else: ?>
         <div class="account-orders">
@@ -75,7 +74,7 @@ $pedidos = $pedidos ?? [];
                 <?php $rastreioLink = rastreio_url($pedido['codigo_rastreio'] ?? null, $pedido['transportadora'] ?? null); ?>
                 <article class="account-order">
                     <header>
-                        <p class="eyebrow"><?= e($pedido['codigo']) ?></p>
+                        <h3><?= e($pedido['codigo']) ?></h3>
                         <?php $digitalPedido = pedido_so_digital($pedido); ?>
                     <span class="status-pill status-<?= e($pedido['status']) ?>"><?= e(pedido_status_rotulo($pedido['status'], $digitalPedido)) ?></span>
                     </header>

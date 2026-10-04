@@ -1,8 +1,7 @@
 <section class="page-hero container">
-    <p class="eyebrow">Contrato</p>
     <h1>Termos de Uso</h1>
 </section>
-<section class="container" style="max-width:720px;padding-bottom:5rem">
+<section class="container prose">
     <p>Ao usar o site Elomiah você concorda com estes termos.</p>
     <h2>Objeto</h2>
     <p>Comercialização de aromatizantes, perfumes, difusores, kits e inscrição no curso “O Ritual das Essências”, além de conteúdos institucionais.</p>
