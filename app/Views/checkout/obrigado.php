@@ -69,7 +69,7 @@ $pagoComAcesso = $pago && $digital;
     <?php elseif ($status === 'entregue'): ?>
         <p class="lede">Pedido entregue. Se algo não estiver certo, você tem 7 dias para pedir a troca pelo WhatsApp.</p>
     <?php elseif ($pendente && $ehPix && $pixPayload !== ''): ?>
-        <p class="lede">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confere na Nubank e marca como pago. Você recebe um e-mail — esta página não confirma sozinha pelo banco.' ?></p>
+        <p class="lede">Pague <?= e(money($pedido['total'] ?? 0)) ?> no Pix<?php if ((float) ($pedido['desconto'] ?? 0) > 0): ?>, já com <?= e(money($pedido['desconto'])) ?> de desconto<?php endif; ?>. <?= $pixAutomatico ? 'Esta página confirma sozinha quando o banco autorizar.' : 'O ateliê confere na Nubank e marca como pago. Você recebe um e-mail — esta página não confirma sozinha pelo banco.' ?></p>
         <div class="pix-box">
             <?php if ($pixQrBase64 !== ''): ?>
                 <img class="pix-qr" src="data:image/png;base64,<?= e($pixQrBase64) ?>" alt="QR Code Pix" width="220" height="220">

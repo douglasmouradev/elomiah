@@ -13,6 +13,8 @@ use App\Controllers\Admin\LogController;
 use App\Controllers\Admin\NotificacaoController as AdminNotificacaoController;
 use App\Controllers\Admin\PedidoController as AdminPedidoController;
 use App\Controllers\Admin\ProdutoController as AdminProdutoController;
+use App\Controllers\Admin\VitrineController as AdminVitrineController;
+use App\Controllers\AjudaController;
 use App\Controllers\AuthController;
 use App\Controllers\CarrinhoController;
 use App\Controllers\CheckoutController;
@@ -23,6 +25,7 @@ use App\Controllers\DepoimentosController;
 use App\Controllers\HomeController;
 use App\Controllers\LgpdController;
 use App\Controllers\LojaController;
+use App\Controllers\NewsletterController;
 use App\Controllers\PagamentoController;
 use App\Controllers\ProdutoController;
 use App\Controllers\SobreController;
@@ -79,6 +82,10 @@ return static function (Router $router): void {
     $router->get('/privacidade', [LgpdController::class, 'privacidade']);
     $router->get('/termos', [LgpdController::class, 'termos']);
     $router->get('/meus-dados', [LgpdController::class, 'meusDados']);
+    $router->get('/ajuda/envios', [AjudaController::class, 'envios']);
+    $router->get('/ajuda/pagamento', [AjudaController::class, 'pagamento']);
+    $router->get('/ajuda/trocas', [AjudaController::class, 'trocas']);
+    $router->post('/newsletter', [NewsletterController::class, 'store']);
     $router->post('/meus-dados', [LgpdController::class, 'solicitar']);
     $router->post('/cookies/consentimento', [LgpdController::class, 'cookies']);
 
@@ -122,7 +129,10 @@ return static function (Router $router): void {
     $router->post('/admin/pagamento', [AdminFinanceiroController::class, 'update'], $admin);
     $router->post('/admin/despacho', [AdminFinanceiroController::class, 'despacho'], $admin);
     $router->post('/admin/pix', [AdminFinanceiroController::class, 'pix'], $admin);
-    $router->post('/admin/vitrine', [AdminFinanceiroController::class, 'vitrine'], $admin);
+    $router->get('/admin/vitrine', [AdminVitrineController::class, 'edit'], $admin);
+    $router->post('/admin/vitrine', [AdminVitrineController::class, 'update'], $admin);
+    $router->get('/admin/newsletter.csv', [AdminVitrineController::class, 'exportar'], $admin);
+    $router->post('/admin/newsletter/{id}/remover', [AdminVitrineController::class, 'remover'], $admin);
     $router->post('/admin/loja', [AdminFinanceiroController::class, 'loja'], $admin);
 
     $router->get('/admin/logs', [LogController::class, 'index'], $admin);

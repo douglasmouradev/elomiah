@@ -4,6 +4,7 @@ $p = $p ?? $produto ?? [];
 $img = $p['imagem'] ?? 'images/frasco-despertar.webp';
 $cor = (string) ($p['cor_destaque'] ?? '#173A2C');
 $link = url('/produto/' . $p['slug']);
+$pagamento = preco_pagamento((float) ($p['preco_promocional'] ?: $p['preco']));
 $noCarrinho = ($p['compra_tipo'] ?? 'carrinho') === 'carrinho' && !produto_digital($p);
 ?>
 <article class="product-card" style="--c:<?= e($cor) ?>" data-nevoa="<?= e($cor) ?>">
@@ -23,6 +24,9 @@ $noCarrinho = ($p['compra_tipo'] ?? 'carrinho') === 'carrinho' && !produto_digit
                 <?= e(money($p['preco'])) ?>
             <?php endif; ?>
         </p>
+        <?php if ($pagamento['pix'] !== null): ?>
+            <p class="price-pix"><?= e(money($pagamento['pix'])) ?> no Pix</p>
+        <?php endif; ?>
         <?php if ($noCarrinho && (int) ($p['estoque'] ?? 0) > 0): ?>
             <form method="post" action="<?= e(url('/carrinho/adicionar')) ?>" class="card-add">
                 <?= csrf_field() ?>

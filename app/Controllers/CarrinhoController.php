@@ -21,6 +21,7 @@ final class CarrinhoController extends Controller
             'carrinho' => $carrinho,
             'freteInfo' => $frete,
             'freteGratis' => frete_gratis_progresso($carrinho),
+            'brinde' => brinde_progresso($carrinho),
             'estimado' => $carrinho['total'] + $frete['valor'],
         ]);
     }
@@ -128,6 +129,10 @@ final class CarrinhoController extends Controller
                 $p['falta'] = money($p['falta']);
                 return $p;
             })(frete_gratis_progresso($carrinho)),
+            'brinde' => (static function (array $b): array {
+                $b['falta'] = money($b['falta']);
+                return $b;
+            })(brinde_progresso($carrinho)),
             'logado' => \App\Core\Auth::check(),
         ];
     }

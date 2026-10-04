@@ -36,5 +36,6 @@ return [
         'cadastro' => ['max' => 5, 'window' => 3600],
         'pagar_cartao' => ['max' => 8, 'window' => 600],
         'pedido_status' => ['max' => 80, 'window' => 180],
+        'newsletter' => ['max' => 4, 'window' => 3600],
     ],
 ];

@@ -38,6 +38,7 @@ final class CheckoutController extends Controller
         $endereco = $requerEnvio ? Endereco::ultimoDoCliente((int) Auth::id()) : null;
         $frete = frete_do_carrinho($carrinho);
         $total = $carrinho['total'] + $frete['valor'];
+        $pixPronto = Pix::configurado() || MercadoPago::configurado();
 
         $this->view('checkout/index', [
             'title' => 'Checkout — Elomiah',
@@ -50,6 +51,9 @@ final class CheckoutController extends Controller
             'requerEnvio' => $requerEnvio,
             'mpPronto' => MercadoPago::configurado(),
             'pixPronto' => Pix::configurado(),
+            'descontoPix' => $pixPronto ? valor_desconto_pix($total) : 0.0,
+            'pctPix' => $pixPronto ? desconto_pix() : 0.0,
+            'brinde' => brinde_progresso($carrinho),
         ]);
     }
 
@@ -134,6 +138,12 @@ final class CheckoutController extends Controller
         }
 
         $frete = frete_do_carrinho($carrinho)['valor'];
+        $desconto = $metodo === 'pix' ? valor_desconto_pix($carrinho['total'] + $frete) : 0.0;
+        $observacoes = trim((string) ($data['observacoes'] ?? ''));
+        $brinde = brinde_progresso($carrinho);
+        if ($brinde['atingido']) {
+            $observacoes = trim($observacoes . "\nBrinde: " . $brinde['texto']);
+        }
         $codigo = 'ELO-' . strtoupper(bin2hex(random_bytes(4)));
 
         $pedidoId = Pedido::create([
@@ -143,10 +153,10 @@ final class CheckoutController extends Controller
             'status' => 'pendente',
             'subtotal' => $carrinho['total'],
             'frete' => $frete,
-            'desconto' => 0,
-            'total' => $carrinho['total'] + $frete,
+            'desconto' => $desconto,
+            'total' => $carrinho['total'] + $frete - $desconto,
             'metodo_pagamento' => $metodo,
-            'observacoes' => $data['observacoes'] ?? null,
+            'observacoes' => $observacoes !== '' ? $observacoes : null,
             'nome_cliente' => $data['nome'],
             'email_cliente' => strtolower((string) $data['email']),
             'telefone_cliente' => preg_replace('/\D+/', '', (string) $data['telefone']),
@@ -186,7 +196,7 @@ final class CheckoutController extends Controller
         ];
 
         $link = '';
-        $totalPedido = $carrinho['total'] + $frete;
+        $totalPedido = $carrinho['total'] + $frete - $desconto;
         try {
             if ($metodo === 'pix') {
                 $this->salvarPix($pedidoId, $pedidoRef, $codigo, $totalPedido);

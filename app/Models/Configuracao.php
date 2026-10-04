@@ -71,33 +71,77 @@ final class Configuracao extends Model
         self::set('frete_prazo', $prazo);
     }
 
-    /** @return array{frete_gratis: float, avisos: list<string>, atendimento: string} */
+    public const REDES = ['instagram' => 'Instagram', 'tiktok' => 'TikTok', 'youtube' => 'YouTube', 'facebook' => 'Facebook'];
+
+    /**
+     * @return array{frete_gratis: float, desconto_pix: float, parcelas: int, brinde_acima: float, brinde_texto: string,
+     *   avisos: list<string>, atendimento: string, redes: array<string, string>, faq: list<array{p: string, r: string}>|null}
+     */
     public static function vitrine(): array
     {
         static $cache = null;
         if ($cache !== null) {
             return $cache;
         }
-        $avisos = preg_split('/\R/', (string) self::get('faixa_avisos', '')) ?: [];
-        $avisos = array_values(array_filter(array_map('trim', $avisos), static fn ($a) => $a !== ''));
+        self::garantir('redes_instagram', 'https://instagram.com/elomiah');
+
+        $redes = [];
+        foreach (array_keys(self::REDES) as $rede) {
+            $url = trim((string) self::get('redes_' . $rede, ''));
+            if ($url !== '') {
+                $redes[$rede] = $url;
+            }
+        }
+        $faq = self::get('faq_loja');
+        $faq = $faq === null ? null : array_values(array_filter(
+            (array) json_decode((string) $faq, true),
+            static fn ($i) => is_array($i) && ($i['p'] ?? '') !== '' && ($i['r'] ?? '') !== ''
+        ));
 
         return $cache = [
             'frete_gratis' => max(0, (float) self::get('frete_gratis_acima', '0')),
-            'avisos' => array_slice($avisos, 0, 3),
+            'desconto_pix' => min(30, max(0, (float) self::get('desconto_pix', '0'))),
+            'parcelas' => min(6, max(0, (int) self::get('parcelas_sem_juros', '0'))),
+            'brinde_acima' => max(0, (float) self::get('brinde_acima', '0')),
+            'brinde_texto' => trim((string) self::get('brinde_texto', '')),
+            'avisos' => self::linhas((string) self::get('faixa_avisos', ''), 3, 90),
             'atendimento' => trim((string) self::get('atendimento_horario', '')),
+            'redes' => $redes,
+            'faq' => $faq,
         ];
     }
 
-    public static function setVitrine(float $freteGratis, string $avisos, string $atendimento): void
+    /** @param array<string, mixed> $d */
+    public static function setVitrine(array $d): void
     {
-        $linhas = preg_split('/\R/', $avisos) ?: [];
-        $linhas = array_slice(array_values(array_filter(array_map(
-            static fn ($l) => mb_substr(trim($l), 0, 90),
-            $linhas
-        ), static fn ($l) => $l !== '')), 0, 3);
-        self::set('frete_gratis_acima', number_format(max(0, round($freteGratis, 2)), 2, '.', ''));
-        self::set('faixa_avisos', implode("\n", $linhas));
-        self::set('atendimento_horario', mb_substr(trim($atendimento), 0, 120));
+        $dinheiro = static fn ($v) => number_format(max(0, round((float) str_replace(',', '.', (string) $v), 2)), 2, '.', '');
+        self::set('frete_gratis_acima', $dinheiro($d['frete_gratis_acima'] ?? 0));
+        self::set('desconto_pix', (string) min(30, max(0, round((float) str_replace(',', '.', (string) ($d['desconto_pix'] ?? 0)), 1))));
+        self::set('parcelas_sem_juros', (string) min(6, max(0, (int) ($d['parcelas_sem_juros'] ?? 0))));
+        self::set('brinde_acima', $dinheiro($d['brinde_acima'] ?? 0));
+        self::set('brinde_texto', mb_substr(trim((string) ($d['brinde_texto'] ?? '')), 0, 80));
+        self::set('faixa_avisos', implode("\n", self::linhas((string) ($d['faixa_avisos'] ?? ''), 3, 90)));
+        self::set('atendimento_horario', mb_substr(trim((string) ($d['atendimento_horario'] ?? '')), 0, 120));
+        foreach (array_keys(self::REDES) as $rede) {
+            $url = trim((string) ($d['redes_' . $rede] ?? ''));
+            self::set('redes_' . $rede, preg_match('#^https://[^\s"<>]+$#', $url) ? mb_substr($url, 0, 200) : '');
+        }
+        $faq = [];
+        foreach ((array) ($d['faq_p'] ?? []) as $i => $p) {
+            $p = mb_substr(trim((string) $p), 0, 160);
+            $r = mb_substr(trim((string) (($d['faq_r'] ?? [])[$i] ?? '')), 0, 800);
+            if ($p !== '' && $r !== '') {
+                $faq[] = ['p' => $p, 'r' => $r];
+            }
+        }
+        self::set('faq_loja', (string) json_encode(array_slice($faq, 0, 8), JSON_UNESCAPED_UNICODE));
+    }
+
+    /** @return list<string> */
+    private static function linhas(string $texto, int $max, int $tamanho): array
+    {
+        $linhas = array_map(static fn ($l) => mb_substr(trim($l), 0, $tamanho), preg_split('/\R/', $texto) ?: []);
+        return array_slice(array_values(array_filter($linhas, static fn ($l) => $l !== '')), 0, $max);
     }
 
     public static function pix(): array

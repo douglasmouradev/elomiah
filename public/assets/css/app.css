@@ -202,6 +202,8 @@ hr { border: 0; border-top: 1px solid var(--linha); margin: var(--s-5) 0; }
 .field-hint { font-size: var(--t-sm); color: var(--tinta-suave); }
 .price { font-weight: 600; color: var(--metal-escuro); font-variant-numeric: tabular-nums; }
 .price-lg { font-size: var(--t-lg); font-weight: 500; margin: 0 0 var(--s-2); }
+.price-terms { display: grid; gap: 2px; margin: calc(var(--s-1) * -1) 0 var(--s-2); font-size: var(--t-sm); color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.price-terms strong { color: var(--tinta); font-weight: 600; }
 .price-was { color: var(--tinta-suave); text-decoration: line-through; font-weight: 400; margin-left: var(--s-1); }
 
 /* ========== Grade ========== */
@@ -523,6 +525,55 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-1); }
 .site-footer a { color: inherit; text-decoration: none; }
 .site-footer a:hover { color: var(--papel); text-decoration: underline; }
+.footer-news {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: var(--s-3) var(--calha);
+  align-items: start;
+  margin-bottom: var(--s-6);
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid rgba(251, 250, 246, 0.16);
+}
+.footer-news-title {
+  margin: 0 0 var(--s-1);
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-xl);
+  font-weight: 400;
+  color: var(--papel);
+}
+.footer-news p { margin: 0; max-width: 42ch; }
+.news-campos { display: flex; gap: var(--s-1); }
+.news-campos input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--s-2);
+  border: 1px solid rgba(251, 250, 246, 0.36);
+  border-radius: var(--raio-1);
+  background: transparent;
+  color: var(--papel);
+  font: inherit;
+}
+.news-campos input::placeholder { color: rgba(251, 250, 246, 0.6); }
+.news-campos input:focus { outline: 2px solid var(--papel); outline-offset: 2px; }
+.news-campos .btn { --btn-fundo: var(--papel); --btn-cor: var(--tinta); --btn-borda: var(--papel); flex: none; }
+.news-campos .btn:hover { --btn-fundo: var(--vidro); background: var(--vidro); color: var(--tinta); }
+.news-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.news-aceite { display: flex; gap: var(--s-1); align-items: flex-start; margin-top: var(--s-2); font-size: var(--t-xs); }
+.news-aceite input { margin-top: 3px; accent-color: var(--metal); }
+.news-aceite a { text-decoration: underline; }
+.news-msg { margin-top: var(--s-1) !important; font-size: var(--t-sm); color: var(--papel); min-height: 1.4em; }
+.news-msg.is-err { color: #F3C9A8; }
+.redes { display: flex !important; gap: var(--s-1) !important; margin-top: var(--s-2) !important; }
+.redes a {
+  display: grid;
+  place-items: center;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(251, 250, 246, 0.28);
+  border-radius: 50%;
+  transition: background-color var(--d-1) var(--ease-out), color var(--d-1) var(--ease-out);
+}
+.redes a:hover { background: var(--papel); color: var(--tinta); text-decoration: none; }
 .footer-horario { color: rgba(251, 250, 246, 0.66); }
 .footer-pay {
   display: flex;
@@ -572,6 +623,15 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   transition: transform var(--d-4) var(--ease-out);
 }
 .frete-gratis.is-ok .frete-barra i { background: var(--tinta); }
+
+.brinde-nota {
+  margin: 0 0 var(--s-2);
+  padding: var(--s-1) var(--s-2);
+  border-left: 2px solid var(--metal);
+  background: var(--veu);
+  font-size: var(--t-sm);
+}
+.totals-pix dd { color: var(--tinta); }
 
 /* ========== Home: prateleira ========== */
 .shelf { padding-top: var(--s-5) !important; padding-bottom: var(--s-6) !important; }
@@ -668,6 +728,125 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 .geo blockquote p { margin: 0 0 var(--s-2); }
 
 /* Depoimentos */
+/* Ritual: frasco que borrifa ao rolar */
+.ritual { --p: 0; --cor: var(--metal); position: relative; padding: 0 !important; }
+.ritual-palco {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--calha);
+  align-items: center;
+  width: min(100% - 2 * var(--margem), var(--largura, 1200px));
+  margin-inline: auto;
+  padding-block: var(--s-5);
+}
+.ritual-frasco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: min(72vh, 640px);
+  border-radius: var(--raio-2, 12px);
+  background:
+    radial-gradient(60% 50% at 50% 42%, color-mix(in srgb, var(--cor) 34%, transparent), transparent 70%),
+    var(--papel);
+  overflow: hidden;
+  transition: background-color var(--d-4) var(--ease-out);
+}
+.ritual-frasco img {
+  grid-area: 1 / 1;
+  height: calc(min(72vh, 640px) * 0.84);
+  width: auto;
+  max-width: 80%;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 30px 60px -30px rgba(23, 58, 44, 0.45);
+  opacity: 0;
+  transform: translateY(calc((0.5 - var(--p)) * 60px)) rotate(calc((var(--p) - 0.5) * 5deg)) scale(0.97);
+  transition: opacity var(--d-3) var(--ease-out);
+  will-change: transform, opacity;
+}
+.ritual-frasco img.is-on { opacity: 1; }
+.ritual-frasco img:first-of-type { opacity: 1; }
+.js .ritual-frasco img:first-of-type:not(.is-on) { opacity: 0; }
+.ritual-nevoa { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; filter: blur(1.2px); }
+.ritual-titulo { margin: 0 0 var(--s-3); font-size: var(--t-2xl); }
+.ritual-passos { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-4); }
+.ritual-passos li { display: grid; gap: var(--s-1); }
+.ritual-passos h3 { margin: 0; font-size: var(--t-xl); color: var(--tinta); }
+.ritual-passos p { margin: 0; color: var(--tinta-suave); max-width: 36ch; }
+.ritual-num { font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.12em; color: var(--c); }
+.ritual-trilha { display: none; }
+
+.js .ritual { height: calc(var(--n) * 60vh + 100vh); }
+.js .ritual-palco {
+  position: sticky;
+  top: var(--altura-topo);
+  height: calc(100vh - var(--altura-topo));
+  padding-block: var(--s-3);
+}
+.js .ritual-passos { gap: 0; }
+.js .ritual-passos li {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity var(--d-3) var(--ease-out), transform var(--d-3) var(--ease-out), visibility 0s linear var(--d-3);
+}
+.js .ritual-passos li.is-on { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.js .ritual-trilha {
+  display: block;
+  height: 2px;
+  margin-top: var(--s-4);
+  max-width: 280px;
+  background: var(--linha);
+}
+.js .ritual-trilha i {
+  display: block;
+  height: 100%;
+  background: var(--cor);
+  transform: scaleX(var(--p));
+  transform-origin: left;
+}
+
+/* Avaliações */
+.avaliacoes .section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-1) var(--s-3); max-width: none; }
+.avaliacoes .section-head h2 { margin: 0; }
+.text-link { font-size: var(--t-sm); font-weight: 500; color: var(--tinta); text-underline-offset: 4px; }
+.avaliacoes-lista {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--calha);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.avaliacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-3);
+  border-top: 2px solid var(--c);
+  background: var(--papel);
+}
+.avaliacao-nota { margin: 0; color: var(--metal); letter-spacing: 0.12em; font-size: var(--t-sm); }
+.avaliacao-nota span { color: var(--linha); }
+.avaliacao blockquote { margin: 0; flex: 1; }
+.avaliacao blockquote p {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.avaliacao-autor { display: flex; justify-content: space-between; gap: var(--s-1); margin: var(--s-1) 0 0; font-size: var(--t-sm); }
+.avaliacao-autor time { color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.avaliacao-aroma { margin: 0; font-size: var(--t-xs); color: var(--tinta-suave); }
+
+/* Perguntas frequentes */
+.faq-home { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--s-3) var(--calha); align-items: start; }
+.faq-home h2 { margin: 0; }
+.faq-home .accordion summary { font-size: var(--t-base); }
+
 .testimonial {
   max-width: 880px;
   padding-left: var(--s-4);
@@ -799,7 +978,8 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
 .product-info h3 a:hover { text-decoration: underline; }
 .product-aroma { margin: 0; font-size: var(--t-sm); color: var(--tinta-suave); }
 .product-info .price { grid-column: 1; margin: var(--s-0) 0 0; font-size: var(--t-sm); }
-.card-add { grid-column: 2; grid-row: 1 / span 3; align-self: center; position: relative; z-index: 1; margin: 0; }
+.price-pix { grid-column: 1; margin: 0; font-size: var(--t-xs); color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.card-add { grid-column: 2; grid-row: 1 / span 4; align-self: center; position: relative; z-index: 1; margin: 0; }
 .card-add button {
   display: grid;
   place-items: center;
@@ -1276,6 +1456,12 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   .course-band img { min-height: 240px; max-height: 320px; }
   .elo-row { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); padding: var(--s-3); }
   .footer-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .avaliacoes-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ritual-palco { grid-template-columns: 1fr; align-content: center; gap: var(--s-3); }
+  .ritual-frasco { height: 46vh; }
+  .ritual-frasco img { height: calc(46vh * 0.86); }
+  .ritual-titulo { font-size: var(--t-xl); margin-bottom: var(--s-2); }
+  .faq-home { grid-template-columns: 1fr; }
   .footer-grid > :first-child { grid-column: 1 / -1; }
 }
 
@@ -1324,6 +1510,20 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
   .modulo > span { grid-column: 2; }
   .cookie-banner { left: var(--s-1); right: var(--s-1); bottom: var(--s-1); width: auto; padding: var(--s-2); }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--calha); }
+  .footer-news { grid-template-columns: 1fr; }
+  .avaliacoes-lista {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 82vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--margem) * -1);
+    padding: 0 var(--margem) var(--s-1);
+    scroll-padding-inline: var(--margem);
+    scrollbar-width: none;
+  }
+  .avaliacao { scroll-snap-align: start; }
+  .news-campos { flex-direction: column; }
   .site-footer { margin-top: var(--s-6); }
 }
 
@@ -1339,4 +1539,5 @@ input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: v
     scroll-behavior: auto !important;
   }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .ritual-frasco img { transform: none; }
 }

@@ -130,6 +130,7 @@ final class NotaCompra
 
         return '<p style="margin:0 0 4px;font-size:14px;color:#5C6B61">Subtotal ' . e(money($pedido['subtotal'] ?? 0)) . '</p>'
             . '<p style="margin:0 0 8px;font-size:14px;color:#5C6B61">' . e($envio) . ' · ' . e(money($pedido['frete'] ?? 0)) . '</p>'
+            . ((float) ($pedido['desconto'] ?? 0) > 0 ? '<p style="margin:0 0 8px;font-size:14px;color:#5C6B61">Desconto no Pix · − ' . e(money($pedido['desconto'])) . '</p>' : '')
             . '<p style="margin:0 0 22px;font-size:22px;font-family:Georgia,serif;color:#1B4332">Total ' . e(money($pedido['total'] ?? 0)) . '</p>';
     }
 

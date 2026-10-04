@@ -52,7 +52,7 @@ $msgEnvio = 'Olá, ' . ($pedido['nome_cliente'] ?? '') . '. Seu pedido ' . ($ped
     </tbody>
 </table>
 <?php $freteInfo = $digital ? ['nome' => 'Acesso digital', 'prazo' => 'Sem despacho'] : frete(); ?>
-<p>Subtotal <?= e(money($pedido['subtotal'])) ?> · <?= e($freteInfo['nome']) ?> <?= e(money($pedido['frete'])) ?> · <strong>Total <?= e(money($pedido['total'])) ?></strong></p>
+<p>Subtotal <?= e(money($pedido['subtotal'])) ?> · <?= e($freteInfo['nome']) ?> <?= e(money($pedido['frete'])) ?><?php if ((float) ($pedido['desconto'] ?? 0) > 0): ?> · Desconto Pix − <?= e(money($pedido['desconto'])) ?><?php endif; ?> · <strong>Total <?= e(money($pedido['total'])) ?></strong></p>
 <?php if (!$digital): ?>
 <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
 <?php endif; ?>

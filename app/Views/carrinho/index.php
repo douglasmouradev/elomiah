@@ -53,6 +53,9 @@ $logado = \App\Core\Auth::check();
                         <span class="frete-barra" aria-hidden="true"><i style="--pct:<?= (int) $freteGratis['pct'] ?>"></i></span>
                     </div>
                 <?php endif; ?>
+                <?php if (!empty($brinde['ativo'])): ?>
+                    <p class="brinde-nota"><?php if ($brinde['atingido']): ?>Este pedido leva de brinde: <strong><?= e($brinde['texto']) ?></strong>.<?php else: ?>Faltam <strong><?= e(money($brinde['falta'])) ?></strong> para ganhar <?= e($brinde['texto']) ?>.<?php endif; ?></p>
+                <?php endif; ?>
                 <dl class="totals">
                     <div><dt>Aromas</dt><dd><?= e(money($carrinho['total'])) ?></dd></div>
                     <div><dt><?= e($freteInfo['nome']) ?></dt><dd><?= e(money($freteInfo['valor'])) ?></dd></div>

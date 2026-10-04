@@ -43,7 +43,7 @@ $idx = array_search($idxStatus, $ordem, true);
 
     <p class="account-total">Total <?= e(money($pedido['total'] ?? 0)) ?> · <?= e(pagamento_rotulo($pedido['metodo_pagamento'] ?? '')) ?></p>
     <?php $freteInfo = $digital ? ['nome' => 'Acesso digital', 'prazo' => 'Sem despacho'] : frete(); ?>
-    <p class="field-hint"><?= e($freteInfo['nome']) ?> <?= e(money($pedido['frete'] ?? 0)) ?><?= $digital ? '' : ' · ' . e($freteInfo['prazo']) ?></p>
+    <p class="field-hint"><?= e($freteInfo['nome']) ?> <?= e(money($pedido['frete'] ?? 0)) ?><?= $digital ? '' : ' · ' . e($freteInfo['prazo']) ?><?php if ((float) ($pedido['desconto'] ?? 0) > 0): ?> · Desconto no Pix − <?= e(money($pedido['desconto'])) ?><?php endif; ?></p>
 
     <?php if ($digital && in_array($status, ['pago', 'enviado', 'entregue'], true)): ?>
         <p class="pay-safe">A formação está liberada nesta conta.</p>

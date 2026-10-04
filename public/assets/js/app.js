@@ -48,6 +48,142 @@
     }, 5000);
   }
 
+  /* Ritual: o frasco borrifa ao rolar */
+  const ritual = $('[data-ritual]');
+  if (ritual) {
+    const imgs = $$('.ritual-frasco img', ritual);
+    const passos = $$('.ritual-passos li', ritual);
+    const canvas = $('[data-ritual-nevoa]', ritual);
+    const ctx = !reduz && canvas?.getContext ? canvas.getContext('2d') : null;
+    const estreito = matchMedia('(max-width: 900px)').matches;
+    const gotas = [];
+    let atual = -1;
+    let ultimoY = window.scrollY;
+    let rodando = false;
+    let cor = [169, 133, 59];
+
+    const rgb = (hex) => {
+      const n = parseInt(hex.replace('#', ''), 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+    const medir = () => {
+      if (!canvas) return;
+      const r = canvas.getBoundingClientRect();
+      canvas.width = r.width * devicePixelRatio;
+      canvas.height = r.height * devicePixelRatio;
+      ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    };
+    const borrifar = (qtd) => {
+      const img = imgs[Math.max(0, atual)];
+      if (!ctx || !img) return;
+      const base = canvas.getBoundingClientRect();
+      const r = img.getBoundingClientRect();
+      const [bx, by] = (img.dataset.bico || '0.58,0.135').split(',').map(Number);
+      const x = r.left - base.left + r.width * bx;
+      const y = r.top - base.top + r.height * by;
+      const max = estreito ? 70 : 160;
+      for (let i = 0; i < qtd && gotas.length < max; i += 1) {
+        const ang = -0.18 + (Math.random() - 0.5) * 0.7;
+        const vel = 2.2 + Math.random() * 3.6;
+        gotas.push({
+          x: x + 4,
+          y: y + (Math.random() - 0.5) * 3,
+          vx: Math.cos(ang) * vel,
+          vy: Math.sin(ang) * vel,
+          r: 1 + Math.random() * 3.4,
+          a: 0.25 + Math.random() * 0.35,
+          vida: 0,
+          fim: 70 + Math.random() * 60,
+          ouro: Math.random() > 0.6,
+        });
+      }
+      if (!rodando) {
+        rodando = true;
+        requestAnimationFrame(quadro);
+      }
+    };
+    const quadro = () => {
+      const w = canvas.width / devicePixelRatio;
+      const h = canvas.height / devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+      for (let i = gotas.length - 1; i >= 0; i -= 1) {
+        const g = gotas[i];
+        g.x += g.vx;
+        g.y += g.vy;
+        g.vx *= 0.955;
+        g.vy = g.vy * 0.955 - 0.018;
+        g.r += 0.09;
+        g.vida += 1;
+        const f = 1 - g.vida / g.fim;
+        const [cr, cg, cb] = g.ouro ? [201, 162, 75] : cor;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${g.a * f})`;
+        ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+        ctx.fill();
+        if (g.vida >= g.fim) gotas.splice(i, 1);
+      }
+      if (gotas.length) requestAnimationFrame(quadro);
+      else rodando = false;
+    };
+    const ativar = (i) => {
+      if (i === atual) return;
+      const primeira = atual === -1;
+      atual = i;
+      imgs.forEach((el, k) => el.classList.toggle('is-on', k === i));
+      passos.forEach((el, k) => el.classList.toggle('is-on', k === i));
+      const hex = imgs[i]?.dataset.cor || '#A9853B';
+      cor = rgb(hex);
+      ritual.style.setProperty('--cor', hex);
+      if (!primeira) borrifar(estreito ? 26 : 50);
+    };
+    let pedido = false;
+    const atualizar = () => {
+      pedido = false;
+      const r = ritual.getBoundingClientRect();
+      const total = Math.max(1, r.height - window.innerHeight);
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      ritual.style.setProperty('--p', p.toFixed(4));
+      ativar(Math.min(imgs.length - 1, Math.floor(p * imgs.length)));
+      const delta = Math.abs(window.scrollY - ultimoY);
+      ultimoY = window.scrollY;
+      if (delta > 2 && r.top < window.innerHeight && r.bottom > 0) borrifar(Math.min(10, Math.ceil(delta / 12)));
+    };
+    medir();
+    window.addEventListener('resize', () => { medir(); atualizar(); });
+    window.addEventListener('scroll', () => {
+      if (!pedido) {
+        pedido = true;
+        requestAnimationFrame(atualizar);
+      }
+    }, { passive: true });
+    atualizar();
+  }
+
+  /* Newsletter */
+  const news = $('[data-newsletter]');
+  news?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('[data-news-msg]', news);
+    const btn = $('button[type="submit"]', news);
+    btn.disabled = true;
+    try {
+      const res = await fetch(news.action, {
+        method: 'POST',
+        body: new FormData(news),
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      const json = await res.json();
+      msg.textContent = json.message || '';
+      msg.classList.toggle('is-err', !json.ok);
+      if (json.ok) news.reset();
+    } catch {
+      news.submit();
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   /* Topo */
   const header = $('.site-header');
   const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
@@ -184,6 +320,15 @@
       $('.checkout-steps', checkout)?.scrollIntoView({ behavior: reduz ? 'auto' : 'smooth', block: 'start' });
       $('[data-step="2"] input[type="radio"]:checked', checkout)?.focus({ preventScroll: true });
     });
+    const totaisPorMetodo = () => {
+      const cartao = $('input[name="metodo_pagamento"]:checked', checkout)?.value === 'cartao';
+      for (const el of $$('[data-so-pix]')) el.hidden = cartao;
+      for (const el of $$('[data-so-cartao]')) el.hidden = !cartao;
+    };
+    checkout.addEventListener('change', (e) => {
+      if (e.target.name === 'metodo_pagamento') totaisPorMetodo();
+    });
+    totaisPorMetodo();
     voltar?.addEventListener('click', () => {
       checkout.classList.remove('is-pay');
       $('input', passo1)?.focus();
@@ -244,6 +389,13 @@
     return `<div class="frete-gratis${fg.atingido ? ' is-ok' : ''}" role="status"><p>${texto}</p><span class="frete-barra" aria-hidden="true"><i style="--pct:${pctAnterior}" data-pct="${Number(fg.pct) || 0}"></i></span></div>`;
   };
 
+  const notaBrinde = (b) => {
+    if (!b || !b.ativo) return '';
+    return `<p class="brinde-nota">${b.atingido
+      ? `Este pedido leva de brinde: <strong>${esc(b.texto)}</strong>.`
+      : `Faltam <strong>${esc(b.falta)}</strong> para ganhar ${esc(b.texto)}.`}</p>`;
+  };
+
   const desenhar = (estado) => {
     if (!corpo || !rodape) return;
     atualizarContador(estado.count ?? 0);
@@ -270,7 +422,7 @@
         <span class="cart-sub">${esc(i.subtotal)}</span>
       </li>`).join('')}</ul>`;
     rodape.hidden = false;
-    rodape.innerHTML = `${barraFrete(estado.freteGratis)}
+    rodape.innerHTML = `${barraFrete(estado.freteGratis)}${notaBrinde(estado.brinde)}
       <dl class="totals">
         <div><dt>Aromas</dt><dd>${esc(estado.pecas)}</dd></div>
         <div><dt>${esc(estado.frete.nome)}</dt><dd>${esc(estado.frete.valor)}</dd></div>

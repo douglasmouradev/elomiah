@@ -45,6 +45,7 @@ $lgpdPendentes = \App\Models\SolicitacaoLgpd::count('status = :s', ['s' => 'pend
             <?php endif; ?>
         </a>
         <a class="<?= is_active('/admin/pagamento') ? 'is-on' : '' ?>" href="<?= e(url('/admin/pagamento')) ?>">Pagamento</a>
+        <a class="<?= is_active('/admin/vitrine') ? 'is-on' : '' ?>" href="<?= e(url('/admin/vitrine')) ?>">Vitrine</a>
         <a class="<?= is_active('/admin/conta') ? 'is-on' : '' ?>" href="<?= e(url('/admin/conta')) ?>">Senha</a>
         <a class="<?= is_active('/admin/logs') ? 'is-on' : '' ?>" href="<?= e(url('/admin/logs')) ?>">Auditoria</a>
         <a href="<?= e(url('/')) ?>">Ver o site</a>

@@ -6,6 +6,9 @@ $mpPronto = !empty($mpPronto);
 $endereco = $endereco ?? null;
 $requerEnvio = $requerEnvio ?? carrinho_requer_envio($carrinho);
 $freteInfo = $freteInfo ?? frete();
+$descontoPix = (float) ($descontoPix ?? 0);
+$parcelasSemJuros = $mpPronto ? \App\Models\Configuracao::vitrine()['parcelas'] : 0;
+$brinde = $brinde ?? ['ativo' => false];
 ?>
 <section class="page-hero container">
     <h1>Finalizar compra</h1>
@@ -64,12 +67,12 @@ $freteInfo = $freteInfo ?? frete();
                 <label class="pay-option">
                     <input type="radio" name="metodo_pagamento" value="pix" <?= $metodo !== 'cartao' ? 'checked' : '' ?>>
                     <span class="pay-option-title">Pix</span>
-                    <span class="pay-option-hint">QR Code na próxima tela</span>
+                    <span class="pay-option-hint"><?= $descontoPix > 0 ? e(pct((float) $pctPix)) . ' de desconto · QR Code na próxima tela' : 'QR Code na próxima tela' ?></span>
                 </label>
                 <label class="pay-option">
                     <input type="radio" name="metodo_pagamento" value="cartao" <?= $metodo === 'cartao' ? 'checked' : '' ?><?= empty($mpPronto) ? ' disabled' : '' ?>>
                     <span class="pay-option-title">Cartão de crédito</span>
-                    <span class="pay-option-hint"><?= !empty($mpPronto) ? 'Visa, Mastercard, Elo · até 6x' : 'Indisponível no momento' ?></span>
+                    <span class="pay-option-hint"><?= !empty($mpPronto) ? 'Visa, Mastercard, Elo · até ' . ($parcelasSemJuros > 1 ? $parcelasSemJuros . 'x sem juros' : '6x') : 'Indisponível no momento' ?></span>
                 </label>
             </div>
             <p class="pay-safe"><?= !empty($mpPronto) ? 'O número do cartão vai direto ao Mercado Pago e não fica salvo no site.' : 'O Pix é pago na chave da Elomiah e confirmado na tela do pedido.' ?></p>
@@ -96,8 +99,17 @@ $freteInfo = $freteInfo ?? frete();
         <dl class="totals">
             <div><dt>Subtotal</dt><dd><?= e(money($carrinho['total'])) ?></dd></div>
             <div><dt><?= e($freteInfo['nome']) ?></dt><dd><?= e(money($freteInfo['valor'])) ?></dd></div>
-            <div class="totals-total"><dt>Total</dt><dd><?= e(money($total ?? 0)) ?></dd></div>
+            <?php if ($descontoPix > 0): ?>
+                <div class="totals-pix" data-so-pix><dt>Desconto no Pix (<?= e(pct((float) $pctPix)) ?>)</dt><dd>− <?= e(money($descontoPix)) ?></dd></div>
+                <div class="totals-total" data-so-pix><dt>Total no Pix</dt><dd><?= e(money(($total ?? 0) - $descontoPix)) ?></dd></div>
+                <div class="totals-total" data-so-cartao hidden><dt>Total no cartão</dt><dd><?= e(money($total ?? 0)) ?></dd></div>
+            <?php else: ?>
+                <div class="totals-total"><dt>Total</dt><dd><?= e(money($total ?? 0)) ?></dd></div>
+            <?php endif; ?>
         </dl>
+        <?php if (!empty($brinde['atingido'])): ?>
+            <p class="brinde-nota">Este pedido leva de brinde: <strong><?= e($brinde['texto']) ?></strong>.</p>
+        <?php endif; ?>
         <p class="field-hint"><?= e($freteInfo['prazo']) ?></p>
         <p class="field-hint"><?= e(formas_pagamento()) ?> · troca em 7 dias.</p>
     </aside>

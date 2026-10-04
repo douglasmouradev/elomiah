@@ -1,12 +1,20 @@
 <?php
-$v = '10';
+$v = '12';
 $logado = \App\Core\Auth::check();
 $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
 $vitrine = \App\Models\Configuracao::vitrine();
 $avisos = $vitrine['avisos'];
+$automaticos = [];
 if ($vitrine['frete_gratis'] > 0) {
-    array_unshift($avisos, 'Frete grátis nas compras acima de ' . money($vitrine['frete_gratis']));
+    $automaticos[] = 'Frete grátis nas compras acima de ' . money($vitrine['frete_gratis']);
 }
+if (desconto_pix() > 0) {
+    $automaticos[] = pct(desconto_pix()) . ' de desconto no Pix';
+}
+if ($vitrine['brinde_acima'] > 0 && $vitrine['brinde_texto'] !== '') {
+    $automaticos[] = 'Ganhe ' . $vitrine['brinde_texto'] . ' nas compras acima de ' . money($vitrine['brinde_acima']);
+}
+$avisos = array_merge($automaticos, $avisos);
 $loja = \App\Models\Configuracao::loja();
 $cartao = \App\Support\MercadoPago::configurado();
 ?>
@@ -116,10 +124,37 @@ $cartao = \App\Support\MercadoPago::configurado();
     <span id="fim-conteudo" hidden></span>
 </main>
 <footer class="site-footer">
+    <div class="container footer-news" id="newsletter">
+        <div>
+            <h2 class="footer-news-title">Lotes novos, antes de todo mundo</h2>
+            <p>Um e-mail quando sai aroma novo ou lote limitado. Sem enxurrada.</p>
+        </div>
+        <form class="news-form" method="post" action="<?= e(url('/newsletter')) ?>" data-newsletter>
+            <?= csrf_field() ?>
+            <div class="news-campos">
+                <label class="visually-hidden" for="news-email">Seu e-mail</label>
+                <input id="news-email" type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required maxlength="180">
+                <button class="btn" type="submit">Quero receber</button>
+            </div>
+            <input class="news-hp" type="text" name="site" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <label class="news-aceite">
+                <input type="checkbox" name="aceite" value="1" required>
+                <span>Aceito receber e-mails da Elomiah, conforme a <a href="<?= e(url('/privacidade')) ?>">Política de Privacidade</a>. Dá para sair quando quiser.</span>
+            </label>
+            <p class="news-msg" role="status" data-news-msg><?= e((string) (flash('newsletter') ?? '')) ?></p>
+        </form>
+    </div>
     <div class="container footer-grid">
         <div class="footer-brand">
             <img src="<?= e(asset('images/logo-elomiah-compacta-clara.svg')) ?>" alt="Elomiah" width="115" height="44" loading="lazy">
             <p>Sprays de ambiente em vidro, formulados em pequenos lotes pela Geo.</p>
+            <?php if ($vitrine['redes']): ?>
+                <ul class="redes">
+                    <?php foreach ($vitrine['redes'] as $rede => $urlRede): ?>
+                        <li><a href="<?= e($urlRede) ?>" rel="noopener" target="_blank" aria-label="<?= e(\App\Models\Configuracao::REDES[$rede]) ?> da Elomiah"><?php \App\Core\View::partial('partials/icone-rede', ['rede' => $rede]); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
         <div>
             <h2 class="footer-title">Loja</h2>
@@ -131,11 +166,12 @@ $cartao = \App\Support\MercadoPago::configurado();
             </ul>
         </div>
         <div>
-            <h2 class="footer-title">Sua compra</h2>
+            <h2 class="footer-title">Ajuda</h2>
             <ul>
+                <li><a href="<?= e(url('/ajuda/envios')) ?>">Envios e frete</a></li>
+                <li><a href="<?= e(url('/ajuda/pagamento')) ?>">Pagamento</a></li>
+                <li><a href="<?= e(url('/ajuda/trocas')) ?>">Trocas e devoluções</a></li>
                 <li><a href="<?= e(url('/conta')) ?>">Meus pedidos</a></li>
-                <li><?= e(rtrim((string) frete()['prazo'], '. ')) ?></li>
-                <li>Troca em até 7 dias</li>
                 <li><a href="<?= e(url('/meus-dados')) ?>">Seus dados (LGPD)</a></li>
             </ul>
         </div>
@@ -144,7 +180,6 @@ $cartao = \App\Support\MercadoPago::configurado();
             <ul>
                 <li><a href="<?= e($wa) ?>" rel="noopener" target="_blank">WhatsApp</a></li>
                 <li><a href="<?= e(url('/contato')) ?>">Formulário de contato</a></li>
-                <li><a href="https://instagram.com/elomiah" rel="noopener" target="_blank">Instagram @elomiah</a></li>
                 <?php if ($vitrine['atendimento'] !== ''): ?><li class="footer-horario"><?= e($vitrine['atendimento']) ?></li><?php endif; ?>
             </ul>
         </div>
@@ -152,12 +187,12 @@ $cartao = \App\Support\MercadoPago::configurado();
     <div class="container footer-pay">
         <h2 class="footer-title">Formas de pagamento</h2>
         <ul class="pay-badges">
-            <li>Pix</li>
+            <li>Pix<?= desconto_pix() > 0 ? ' com ' . e(pct(desconto_pix())) . ' de desconto' : '' ?></li>
             <?php if ($cartao): ?>
                 <li>Visa</li>
                 <li>Mastercard</li>
                 <li>Elo</li>
-                <li>Até 6x no cartão</li>
+                <li><?= $vitrine['parcelas'] > 1 ? 'Até ' . (int) $vitrine['parcelas'] . 'x sem juros' : 'Até 6x no cartão' ?></li>
             <?php endif; ?>
         </ul>
     </div>

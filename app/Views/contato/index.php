@@ -16,7 +16,12 @@
     <aside>
         <h2>Outros canais</h2>
         <p><a class="btn btn-ghost" href="<?= e(whatsapp_url('Olá, vim pelo site da Elomiah.')) ?>" target="_blank" rel="noopener">Conversar no WhatsApp</a></p>
-        <p><a href="https://instagram.com/elomiah" target="_blank" rel="noopener">Instagram @elomiah</a></p>
+        <?php foreach (\App\Models\Configuracao::vitrine()['redes'] as $rede => $urlRede): ?>
+            <p><a href="<?= e($urlRede) ?>" target="_blank" rel="noopener"><?= e(\App\Models\Configuracao::REDES[$rede]) ?></a></p>
+        <?php endforeach; ?>
+        <?php if (($atendimento = \App\Models\Configuracao::vitrine()['atendimento']) !== ''): ?>
+            <p class="field-hint">Atendimento: <?= e($atendimento) ?></p>
+        <?php endif; ?>
         <p class="field-hint">Para pedir acesso, correção ou exclusão dos seus dados pessoais, use a página <a href="<?= e(url('/meus-dados')) ?>">Seus dados</a>.</p>
     </aside>
 </section>

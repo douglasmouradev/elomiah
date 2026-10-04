@@ -48,6 +48,13 @@ $colecao = (string) ($produto['colecao'] ?? $produto['categoria_nome'] ?? '');
                 <?= e(money($produto['preco'])) ?>
             <?php endif; ?>
         </p>
+        <?php $pagamento = preco_pagamento((float) ($produto['preco_promocional'] ?: $produto['preco'])); ?>
+        <?php if ($pagamento['pix'] !== null || $pagamento['parcelas']): ?>
+            <p class="price-terms">
+                <?php if ($pagamento['pix'] !== null): ?><span><strong><?= e(money($pagamento['pix'])) ?></strong> no Pix (<?= e(pct(desconto_pix())) ?> de desconto)</span><?php endif; ?>
+                <?php if ($pagamento['parcelas']): ?><span>ou <?= (int) $pagamento['parcelas'] ?>x de <?= e(money($pagamento['parcela'])) ?> sem juros no cartão</span><?php endif; ?>
+            </p>
+        <?php endif; ?>
 
         <?php if ($compraTipo === 'carrinho' && $disponivel): ?>
             <form method="post" action="<?= e(url('/carrinho/adicionar')) ?>" class="buy-form">

@@ -211,6 +211,71 @@ function formas_pagamento(): string
     return \App\Support\MercadoPago::configurado() ? 'Pix ou cartão' : 'Pix';
 }
 
+function desconto_pix(): float
+{
+    if (!\App\Support\MercadoPago::configurado() && !\App\Support\Pix::configurado()) {
+        return 0.0;
+    }
+    return \App\Models\Configuracao::vitrine()['desconto_pix'];
+}
+
+function valor_desconto_pix(float $total): float
+{
+    return round($total * desconto_pix() / 100, 2);
+}
+
+function pct(float $valor): string
+{
+    return rtrim(rtrim(number_format($valor, 1, ',', ''), '0'), ',') . '%';
+}
+
+/** @return array{pix: float|null, parcelas: int, parcela: float} */
+function preco_pagamento(float $preco): array
+{
+    $desconto = desconto_pix();
+    $parcelas = \App\Support\MercadoPago::configurado() ? \App\Models\Configuracao::vitrine()['parcelas'] : 0;
+    $parcelas = (int) min($parcelas, floor($preco / 5));
+
+    return [
+        'pix' => $desconto > 0 ? round($preco * (1 - $desconto / 100), 2) : null,
+        'parcelas' => $parcelas > 1 ? $parcelas : 0,
+        'parcela' => $parcelas > 1 ? round($preco / $parcelas, 2) : 0.0,
+    ];
+}
+
+/** @return array{ativo: bool, texto: string, falta: float, atingido: bool} */
+function brinde_progresso(array $carrinho): array
+{
+    $v = \App\Models\Configuracao::vitrine();
+    $ativo = $v['brinde_acima'] > 0 && $v['brinde_texto'] !== '' && carrinho_requer_envio($carrinho);
+    $total = (float) ($carrinho['total'] ?? 0);
+
+    return [
+        'ativo' => $ativo,
+        'texto' => $v['brinde_texto'],
+        'falta' => $ativo ? max(0, $v['brinde_acima'] - $total) : 0.0,
+        'atingido' => $ativo && $total >= $v['brinde_acima'],
+    ];
+}
+
+/** @return list<array{p: string, r: string}> */
+function faq_loja(): array
+{
+    $faq = \App\Models\Configuracao::vitrine()['faq'];
+    if ($faq !== null) {
+        return $faq;
+    }
+    $frete = frete();
+
+    return [
+        ['p' => 'Em quanto tempo o pedido chega?', 'r' => rtrim($frete['prazo'], '. ') . '. Você acompanha o andamento em Meus pedidos.'],
+        ['p' => 'Quais são as formas de pagamento?', 'r' => formas_pagamento() . '. No Pix, o QR aparece na tela do pedido assim que você finaliza.'],
+        ['p' => 'Posso trocar ou devolver?', 'r' => 'Sim. Você tem 7 dias, contados do recebimento, para desistir da compra. Fale com a gente pelo WhatsApp ou pelo formulário de contato com o código do pedido.'],
+        ['p' => 'Como usar o spray de ambiente?', 'r' => 'Borrife no ar ou em tecidos, a cerca de 20 cm. Não aplique nos olhos e não ingira.'],
+        ['p' => 'Como acesso o curso O Ritual das Essências?', 'r' => 'Depois que o pagamento é confirmado, o acesso libera na sua conta, por 12 meses.'],
+    ];
+}
+
 function slugify(string $text): string
 {
     $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text) ?: $text;
