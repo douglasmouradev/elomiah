@@ -25,7 +25,7 @@ return [
     'loja_ie' => (string) env('LOJA_IE', ''),
     'loja_endereco' => (string) env('LOJA_ENDERECO', ''),
     'session_secure' => env('SESSION_SECURE', '0') === '1',
-    'upload_max_mb' => 4,
+    'upload_max_mb' => 12,
     'rate_limit' => [
         'login' => ['max' => 5, 'window' => 900],
         'contato' => ['max' => 5, 'window' => 600],

@@ -13,6 +13,14 @@ echo "==> Atualizando código (${BRANCH})"
 git fetch origin
 git reset --hard "origin/${BRANCH}"
 
+cat > "/etc/php/${PHP_VER}/fpm/conf.d/99-elomiah.ini" <<'INI'
+upload_max_filesize = 16M
+post_max_size = 64M
+memory_limit = 256M
+expose_php = Off
+date.timezone = America/Sao_Paulo
+INI
+
 chown -R www-data:www-data storage public/assets/uploads
 cp deploy/nginx-elomiah.conf /etc/nginx/sites-available/elomiah
 nginx -t

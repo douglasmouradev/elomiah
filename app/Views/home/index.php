@@ -13,6 +13,8 @@ $porId = [];
 foreach ($produtos as $p) {
     $porId[(int) $p['id']] = $p;
 }
+$naPrateleira = array_map(static fn ($p) => (int) $p['id'], array_merge($refugio, $elo ? [$elo] : []));
+$outros = array_values(array_filter($produtos, static fn ($p) => !in_array((int) $p['id'], $naPrateleira, true)));
 $avaliacoes = array_slice($depoimentos, 0, 6);
 $faq = faq_loja();
 View::partial('partials/flash');
@@ -80,6 +82,20 @@ View::partial('partials/flash');
             <p class="lede">Lavanda e bergamota na saída, algodão e camomila no corpo, musk e sândalo no fundo. Borrife no ar ou em tecidos, a 20 cm, e o quarto fica com cheiro de roupa limpa.</p>
             <p><a class="btn btn-ghost" href="<?= e(url('/produto/' . $elo['slug'])) ?>">Conhecer o Elo, <?= e(money($elo['preco_promocional'] ?: $elo['preco'])) ?></a></p>
         </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($outros): ?>
+<section class="container" aria-labelledby="titulo-outros">
+    <div class="section-head avaliacoes-head">
+        <h2 id="titulo-outros">Também no ateliê</h2>
+        <a class="text-link" href="<?= e(url('/loja')) ?>">Ver tudo na loja</a>
+    </div>
+    <div class="product-grid">
+        <?php foreach ($outros as $p): ?>
+            <?php View::partial('partials/product-card', ['p' => $p]); ?>
+        <?php endforeach; ?>
     </div>
 </section>
 <?php endif; ?>

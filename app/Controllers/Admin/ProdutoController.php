@@ -153,6 +153,11 @@ final class ProdutoController extends Controller
             }
         }
 
+        $recusadas = Upload::recusadas();
+        if ($recusadas) {
+            Session::setFlash('error', 'Produto guardado, mas estas fotos não entraram: ' . implode('; ', $recusadas) . '. Envie de novo pela edição do produto.');
+            redirect('/admin/produtos/' . $id . '/editar');
+        }
         Session::setFlash('success', 'Produto guardado com cuidado.');
         redirect('/admin/produtos');
     }

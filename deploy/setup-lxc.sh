@@ -54,8 +54,8 @@ apt-get install -y "php${PHP_VER}-fpm" "php${PHP_VER}-cli" "php${PHP_VER}-mysql"
   "php${PHP_VER}-curl" "php${PHP_VER}-gd" "php${PHP_VER}-xml" "php${PHP_VER}-intl" "php${PHP_VER}-zip"
 
 cat > "/etc/php/${PHP_VER}/fpm/conf.d/99-elomiah.ini" <<'EOF'
-upload_max_filesize = 8M
-post_max_size = 24M
+upload_max_filesize = 16M
+post_max_size = 64M
 memory_limit = 256M
 expose_php = Off
 date.timezone = America/Sao_Paulo

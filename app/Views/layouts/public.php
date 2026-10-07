@@ -1,5 +1,5 @@
 <?php
-$v = '13';
+$v = '14';
 $logado = \App\Core\Auth::check();
 $wa = whatsapp_url('Olá, vim pelo site da Elomiah.');
 $vitrine = \App\Models\Configuracao::vitrine();

@@ -2,6 +2,21 @@
   const input = document.querySelector('#imagens');
   const box = document.querySelector('#previews');
   if (!input || !box) return;
+  const LADO = 1800;
+  const reduzir = async (file) => {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type) || typeof createImageBitmap !== 'function') return file;
+    const bmp = await createImageBitmap(file);
+    const escala = Math.min(1, LADO / Math.max(bmp.width, bmp.height));
+    if (escala === 1 && file.size < 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * escala);
+    canvas.height = Math.round(bmp.height * escala);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((ok) => canvas.toBlob(ok, 'image/webp', 0.86));
+    if (!blob || blob.type !== 'image/webp' || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, '') + '.webp', { type: 'image/webp' });
+  };
+
   input.addEventListener('change', () => {
     box.innerHTML = '';
     [...input.files].forEach((file) => {
@@ -9,6 +24,28 @@
       img.src = URL.createObjectURL(file);
       box.appendChild(img);
     });
+  });
+
+  const form = input.form;
+  let pronto = false;
+  form?.addEventListener('submit', async (e) => {
+    if (pronto || !input.files.length || typeof DataTransfer !== 'function') return;
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    const texto = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = 'Preparando as fotos…'; }
+    try {
+      const dt = new DataTransfer();
+      for (const file of input.files) dt.items.add(await reduzir(file));
+      input.files = dt.files;
+    } catch (_) {
+      // Envia as originais; o servidor também reduz.
+    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Enviando…'; }
+    pronto = true;
+    if (form.requestSubmit) form.requestSubmit();
+    else form.submit();
+    window.addEventListener('pageshow', () => { pronto = false; if (btn) btn.textContent = texto; }, { once: true });
   });
 })();
 
